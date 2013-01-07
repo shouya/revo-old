@@ -1,0 +1,10 @@
+GEM
+  remote: http://ruby.taobao.org/
+  specs:
+    racc (1.4.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  racc
