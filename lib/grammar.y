@@ -9,11 +9,11 @@
 
 
 class Revo::Parser
-options result_var
+options no_result_var
 start main
 rule
 
-      main: atom
+         main: atom
 
       literal: STRING   { val[0] }
              | INTEGER  { val[0] }
@@ -21,13 +21,12 @@ rule
              | NAME     { val[0] }
              | SYMBOL   { val[0] }
 
-
          atom: literal  { val[0] }
              | list     { val[0] }
 
-         list: '(' list_content ')'  { val[1] }
+         list: LBRACKET list_content RBRACKET  { val[1] }
 
- list_content: /* empty */       { [] }
+ list_content: /* empty */       { Array.new }
              | list_content atom { val[0] << val[1] }
 
 

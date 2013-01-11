@@ -114,6 +114,10 @@ module Revo
       @scanner.pos
     end
 
+    def parse_int(str)
+      str.to_i
+    end
+
   end
 end
 
