@@ -11,9 +11,10 @@ scanner = Scanner.new
 scanner.scan_string(DATA.read)
 #ap scanner.to_a
 parser = Parser.new(scanner)
-puts parser.do_parse.inspect #to_s
+puts parser.do_parse.to_s
 
 __END__
-(+ 1 2 (+ 2 3 '() ))
+; (+ 1 2 (+ 2 3 '() ))
+(3 . (1 . 2))
 
 

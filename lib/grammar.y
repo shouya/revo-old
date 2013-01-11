@@ -24,6 +24,19 @@ rule
 
          expr: literal  { val[0] }
              | list     { val[0] }
+             | pair     { val[0] }
+
+         pair: LBRACKET  pair_content RBRACKET { val[1] }
+
+ pair_content: literal PERIOD literal {
+                 SExpr.new(val[0]).cons(SExpr.new(val[2]))
+               }
+             | literal PERIOD pair    {
+                 SExpr.new(val[0]).cons(val[2])
+               }
+             | expr pair_content      {
+                 SExpr.new(val[0]).cons(val[1])
+               }
 
          list: LBRACKET list_content RBRACKET  { val[1] }
 

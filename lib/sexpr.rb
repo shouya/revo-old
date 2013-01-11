@@ -6,6 +6,13 @@ require_relative 'prim_types'
 
 module Revo
   class SExpr
+    class << self
+      def eol_expr
+        @eol_expr ||= SExpr.new(EndOfList.instance)
+      end
+    end
+
+
     attr_accessor :next, :val
 
     def initialize(val = nil, next_ = nil)
@@ -41,7 +48,9 @@ module Revo
     protected
     def sub_to_s
       if eol?
-        "\b)"
+        ")"
+      elsif @next.nil?
+        ". #{@val.to_s})"
       else
         "#{@val.to_s} #{@next.sub_to_s}"
       end
