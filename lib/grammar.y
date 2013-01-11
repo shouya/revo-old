@@ -13,22 +13,27 @@ options no_result_var
 start main
 rule
 
-         main: atom
+         main: expr
 
-      literal: STRING   { val[0] }
-             | INTEGER  { val[0] }
-             | FLOAT    { val[0] }
-             | NAME     { val[0] }
-             | SYMBOL   { val[0] }
+      literal: STRING   { String.new(val[0]) }
+             | INTEGER  { Number.new(val[0]) }
+             | FLOAT    { Number.new(val[0]) }
+             | NAME     { Name.new(val[0]) }
+             | SYMBOL   { Symbol.new(val[0]) }
+             | QUOTE LBRACKET RBRACKET { EndOfList.instance }
 
-         atom: literal  { val[0] }
+         expr: literal  { val[0] }
              | list     { val[0] }
 
          list: LBRACKET list_content RBRACKET  { val[1] }
 
- list_content: /* empty */       { Array.new }
-             | list_content atom { val[0] << val[1] }
+ list_content: /* empty */       { SExpr.new }
+             | expr list_content { SExpr.new(val[0]).cons(val[1]) }
 
+
+---- header
+require_relative 'prim_types'
+require_relative 'sexpr'
 
 ---- inner
 attr :scanner

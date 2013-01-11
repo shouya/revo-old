@@ -9,11 +9,11 @@ include Revo
 
 scanner = Scanner.new
 scanner.scan_string(DATA.read)
-# ap scanner.to_a
+#ap scanner.to_a
 parser = Parser.new(scanner)
-ap parser.do_parse
+puts parser.do_parse.inspect #to_s
 
 __END__
-(+ 1 2 (+ 2 3))
+(+ 1 2 (+ 2 3 '() ))
 
 
