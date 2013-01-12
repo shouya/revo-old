@@ -48,7 +48,11 @@ module Revo
     protected
     def sub_to_s
       if eol?
-        ")"
+        if @next.nil?
+          "\b)"
+        else
+          "#{@val.to_s} #{@next.sub_to_s}"
+        end
       elsif @next.nil?
         ". #{@val.to_s})"
       else
