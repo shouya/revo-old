@@ -15,33 +15,36 @@ rule
 
          main: expr
 
-      literal: STRING   { String.new(val[0]) }
-             | INTEGER  { Number.new(val[0]) }
-             | FLOAT    { Number.new(val[0]) }
-             | NAME     { Name.new(val[0]) }
-             | SYMBOL   { Symbol.new(val[0]) }
-             | QUOTE LBRACKET RBRACKET { EndOfList.instance }
+      literal: STRING   { SExpr.new(String.new(val[0])) }
+             | INTEGER  { SExpr.new(Number.new(val[0])) }
+             | FLOAT    { SExpr.new(Number.new(val[0])) }
+             | NAME     { SExpr.new(Name.new(val[0]))   }
+             | SYMBOL   { SExpr.new(Symbol.new(val[0])) }
 
          expr: literal  { val[0] }
              | list     { val[0] }
              | pair     { val[0] }
 
-         pair: LBRACKET  pair_content RBRACKET { val[1] }
+         pair: LBRACKET pair_content RBRACKET { SExpr.new(val[1]) }
 
- pair_content: literal PERIOD literal {
-                 SExpr.new(val[0]).cons(SExpr.new(val[2]))
-               }
-             | literal PERIOD pair    {
-                 SExpr.new(val[0]).cons(val[2])
+ pair_content: expr PERIOD expr {
+                 val[0].cons(val[2])
                }
              | expr pair_content      {
-                 SExpr.new(val[0]).cons(val[1])
+                 val[0].cons(val[1])
                }
 
-         list: LBRACKET list_content RBRACKET  { val[1] }
+         list: LBRACKET list_content RBRACKET  { SExpr.new(val[1]) }
+             | quoted_expr         { SExpr.new(val[0]) }
+
 
  list_content: /* empty */       { SExpr.new }
-             | expr list_content { SExpr.new(val[0]).cons(val[1]) }
+             | expr list_content { val[0].cons(val[1]) }
+
+  quoted_expr: QUOTE expr        {
+                 SExpr.new(Name.new('quote')).cons(val[1].endlist)
+               }
+
 
 
 ---- header

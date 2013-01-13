@@ -1,13 +1,20 @@
 #
 # S expression nodes
 #
+#
+# An s-expression is classically defined[1] inductively as
+#   1. an atom, or
+#   2. an expression of the form (x . y) where x and y are s-expressions.
+# (source: Wikipedia)
+#
+
 
 require_relative 'prim_types'
 
 module Revo
   class SExpr
     class << self
-      def eol_expr
+      def eol_sexpr
         @eol_expr ||= SExpr.new(EndOfList.instance)
       end
     end
@@ -25,38 +32,49 @@ module Revo
       self
     end
     def list?
-      val.is_a? SExpr
+      @val.is_a? SExpr
     end
     def atom?
       !list?
     end
     def eol?
-      val.is_a? EndOfList
+      @val.is_a? EndOfList
+    end
+    def endlist
+      cons self.class.eol_sexpr
     end
 
     def inspect
-      if @val.is_a? EndOfList
+      if eol?
         @val.to_s
       else
         "(#{@val.inspect} . #{@next.inspect})"
       end
     end
     def to_s
-      "(#{@val.inspect} #{@next.sub_to_s}"
+      if atom?
+        @val.inspect
+      else
+        "(#{@val.to_list_string})"
+      end
     end
 
     protected
-    def sub_to_s
-      if eol?
-        if @next.nil?
-          "\b)"
-        else
-          "#{@val.to_s} #{@next.sub_to_s}"
-        end
-      elsif @next.nil?
-        ". #{@val.to_s})"
+    def to_list_string
+      # (1 2 3 . 4)
+      #          ^
+      if @next.nil?
+        ". #{to_s}"
+
+      # (1 2 3)
+      #      ^
+      elsif @next.eol?
+        "#{to_s}"
+
+      # (1 2 3)
+      #    ^
       else
-        "#{@val.to_s} #{@next.sub_to_s}"
+        "#{to_s} #{@next.to_list_string}"
       end
     end
 
