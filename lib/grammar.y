@@ -15,13 +15,13 @@ rule
 
          main: expr
 
-      literal: STRING   { SExpr.new(String.new(val[0])) }
-             | INTEGER  { SExpr.new(Number.new(val[0])) }
-             | FLOAT    { SExpr.new(Number.new(val[0])) }
-             | NAME     { SExpr.new(Name.new(val[0]))   }
-             | SYMBOL   { SExpr.new(Symbol.new(val[0])) }
+      literal: STRING   { String.new(val[0]) }
+             | INTEGER  { Number.new(val[0]) }
+             | FLOAT    { Number.new(val[0]) }
+             | NAME     { Name.new(val[0])   }
+             | SYMBOL   { Symbol.new(val[0]) }
 
-         expr: literal  { val[0] }
+         expr: literal  { SExpr.new(val[0]) }
              | list     { val[0] }
              | pair     { val[0] }
 
