@@ -41,7 +41,7 @@ module Revo
     attr :match, :buffer
 
     def initialize
-      @line_no = 0
+      @line_no = 1
       @column_no = 0
       @filename = '<unknown>'
       @buffer = {}
@@ -111,7 +111,15 @@ module Revo
     end
 
     def column_no
-      @scanner.pos
+      @scanner.pos - @column_no
+    end
+
+    def parse_int(str)
+      str.to_i
+    end
+    def increase_line_number
+      @column_no = @scanner.pos
+      @line_no += 1
     end
 
   end

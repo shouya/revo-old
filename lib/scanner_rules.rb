@@ -5,6 +5,10 @@ module Revo
     rule(/\s+/) { :PASS }
     rule(/\r\n|\r|\n/) { increase_line_number; :PASS }
 
+    symbol_rule(';') { @state = :COMMENT; :PASS }
+    rule(/\r\n|\r|\n/, :COMMENT) { increase_line_number; @state = nil; :PASS }
+    rule(/./, :COMMENT) { :PASS }
+
     symbol_rule('(')  { [:LBRACKET, nil]  }
     symbol_rule(')')  { [:RBRACKET, nil]  }
     symbol_rule(',@') { [:COMMA_AT, nil]  }
@@ -12,6 +16,8 @@ module Revo
     symbol_rule("'")  { [:QUOTE, nil]     }
     symbol_rule('&')  { [:AMPERSAND, nil] }
     symbol_rule('`')  { [:BACKQUOTE, nil] }
+    symbol_rule('.')  { [:PERIOD, nil]    }
+
 
     rule(/\d+\.\d*/) { [:FLOAT, parse_float(@match)] }
     rule(/\d+/)      { [:INTEGER, parse_int(@match)] }
