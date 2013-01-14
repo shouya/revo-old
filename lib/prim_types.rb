@@ -33,17 +33,7 @@ module Revo
       @val = symbol
     end
     def to_s
-      ":#@val"
-    end
-  end
-
-  class Name
-    attr_accessor :val
-    def initialize(name)
-      @val = name
-    end
-    def to_s
-      @val
+      "'#@val"
     end
   end
 
