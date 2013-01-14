@@ -5,7 +5,7 @@
 class Revo::Lambda
   attr_accessor :body, :params
 
-  def eval(context = nil, args = nil)
+  def call(context = nil, args = nil)
     private_context = Context.new(context || Context.global)
 
     private_context.store_lambda_args(construct_args_hash(args))

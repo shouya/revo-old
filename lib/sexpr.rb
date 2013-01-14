@@ -44,18 +44,18 @@ module Revo
       cons self.class.eol_sexpr
     end
 
-    def inspect
-      if eol?
-        @val.to_s
-      else
-        "(#{@val.inspect} . #{@next.inspect})"
-      end
-    end
     def to_s
       if atom?
         @val.inspect
       else
         "(#{@val.to_list_string})"
+      end
+    end
+
+    def each(&block)
+      block.call self
+      unless @next.nil? or @next.eol?
+        @next.each(&block)
       end
     end
 

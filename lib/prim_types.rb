@@ -61,4 +61,14 @@ module Revo
     end
   end
 
+  class BuiltInFunctionType
+    attr_accessor :val
+    def initialize(lambda_)
+      @val = lambda_
+    end
+    def call(env = Context.global, args = SExpr.eol_sexpr)
+      @val.call(env, args)
+    end
+  end
+
 end

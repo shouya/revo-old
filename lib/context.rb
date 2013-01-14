@@ -9,12 +9,12 @@ class Revo::Context
   class << self
     attr_accessor :global
     def global
-      @global ||= Context.new
+      @global ||= Context.new(nil)
     end
   end
 
   def initialize(parent = self.class.global)
-    @symbols = []
+    @symbols = {}
     @parent = parent
   end
 
