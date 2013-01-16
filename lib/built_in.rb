@@ -37,13 +37,13 @@ module Revo::BuiltInFunctions
   def_function(:+) do |env, args|
     sum = 0
     args.each do |x|
-      sum += x.val
+      sum += x.val.val
     end
-    SExpr.new(sum)
+    SExpr.new(Number.new(sum))
   end
 
   def_function(:write) do |env, args|
     puts args.val
-    SExpr.new(args.val)
+    SExpr.new(args)
   end
 end
