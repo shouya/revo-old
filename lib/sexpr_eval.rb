@@ -10,12 +10,11 @@ class Revo::SExpr
       SExpr.new(@val)
     when Revo::Symbol
       SExpr.new(env.lookup(@val.val))
-    when @next.nil
     end
     return self if eol?
     return SExpr.new(@val) if literal?
     return env.lookup(@val.val) if @val.is_a? Revo::Symbol
-    
+
 #    return @val.eval(env) if @val.is_a?(SExpr) && @val.list?
 
     procedure = env.lookup(@val.val) if @val.is_a? Revo::Symbol

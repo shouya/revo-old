@@ -13,17 +13,11 @@ require_relative 'prim_types'
 
 module Revo
   class SExpr
-    class << self
-      def eol_sexpr
-        @eol_expr ||= SExpr.new(EndOfList.instance)
-      end
-    end
-
-
+    include ValueMethods
     attr_accessor :next, :val
 
     def initialize(val = nil, next_ = nil)
-      @val = val ? val : EndOfList.instance
+      @val = val
       @next = next_
     end
 
@@ -31,50 +25,31 @@ module Revo
       @next = next_
       self
     end
-    def list?
-      !atom?
-    end
+
     def atom?
-      @next.nil?
-    end
-    def eol?
-      @val.is_a? EndOfList
-    end
-    def endlist
-      cons self.class.eol_sexpr
+      false
     end
 
     def to_s
-      if atom?
-        @val.inspect
-      else
-        "(#{to_list_string})"
-      end
-    end
-
-    def each(&block)
-      block.call self
-      unless @next.nil? or @next.eol?
-        @next.each(&block)
-      end
+      "(#{to_list_string})"
     end
 
     protected
     def to_list_string
-      # (1 2 3 . 4)
-      #          ^
-      if @next.nil?
-        ". #{@val.to_s}"
-
       # (1 2 3)
       #      ^
-      elsif @next.eol?
+      if @next.nil?
         "#{@val.to_s}"
+
+      # (1 2 3 . 4)     or (1 2 3 . (1 2))
+      #      ^                  ^
+      elsif @next.atom? or @next.next.nil?
+        "#{@val.to_s} . #{@next.to_s}"
 
       # (1 2 3)
       #    ^
       else
-        "#{@val.inspect} #{@next.to_list_string}"
+        "#{@val.to_s} #{@next.to_list_string}"
       end
     end
 

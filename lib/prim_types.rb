@@ -4,20 +4,13 @@
 
 
 module Revo
-  class EndOfList # '()
-    class << self
-      private :new
-      public
-      def instance
-        @_singleton ||= new
-      end
-    end
-    def to_s
-      "NIL"
+  module ValueMethods
+    def list?
+      !atom?
     end
   end
-
   class String
+    include ValueMethods
     attr_accessor :val
     def initialize(str)
       @val = str
@@ -25,9 +18,13 @@ module Revo
     def to_s
       "\"#@val\""
     end
+    def atom?
+      true
+    end
   end
 
   class Symbol
+    include ValueMethods
     attr_accessor :val
     def initialize(symbol)
       @val = symbol
@@ -35,9 +32,13 @@ module Revo
     def to_s
       "'#@val"
     end
+    def atom?
+      true
+    end
   end
 
   class Number
+    include ValueMethods
     attr_accessor :val
     def initialize(num)
       @val = num
@@ -45,9 +46,14 @@ module Revo
     def to_s
       @val.to_s
     end
+    def atom?
+      true
+    end
   end
 
+  # Not supported yet.
   class Char
+    include ValueMethods
     attr_accessor :val
     def initialize(chr)
       if chr.is_a? Integer
@@ -58,6 +64,9 @@ module Revo
     end
     def to_s
       # TODO: Give a suitable represence for char
+    end
+    def atom?
+      true
     end
   end
 
