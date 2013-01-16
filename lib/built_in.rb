@@ -44,12 +44,11 @@ module Revo::BuiltInFunctions
   end
 
   def_function(:write) do |env, args|
-    p args
     puts args.val
     SExpr.new(args)
   end
 
   def_macro(:quote) do |env, args|
-    args
+    SExpr.new(args.val)
   end
 end
