@@ -48,6 +48,7 @@ rule
 
 ---- header
 require_relative 'prim_types'
+require_relative 'symbol'
 require_relative 'sexpr'
 
 ---- inner

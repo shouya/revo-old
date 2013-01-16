@@ -13,7 +13,6 @@ require_relative 'prim_types'
 
 module Revo
   class SExpr
-    include ValueMethods
     attr_accessor :next, :val
 
     def initialize(val = nil, next_ = nil)
@@ -29,21 +28,37 @@ module Revo
     def atom?
       false
     end
+    def list?
+      true
+    end
 
     def to_s
       "(#{to_list_string})"
     end
 
+    def car
+      @val
+    end
+
+    def cdr
+      @next
+    end
+
+    def each(&block)
+      yield @val
+
+      return if list_tail?
+#      raise 'cannot `each` a pair' if pair_tail?
+
+      @next.each(&block)
+    end
+
     protected
     def to_list_string
-      # (1 2 3)
-      #      ^
-      if @next.nil?
+      if list_tail?
         "#{@val.to_s}"
 
-      # (1 2 3 . 4)     or (1 2 3 . (1 2))
-      #      ^                  ^
-      elsif @next.atom? or @next.next.nil?
+      elsif pair_tail?
         "#{@val.to_s} . #{@next.to_s}"
 
       # (1 2 3)
@@ -51,6 +66,17 @@ module Revo
       else
         "#{@val.to_s} #{@next.to_list_string}"
       end
+    end
+
+    def list_tail?
+      # (1 2 3)
+      #      ^
+      @next.nil?
+    end
+    def pair_tail?
+      # (1 2 3 . 4) or (1 2 3 . (1 2))
+      #      ^                  ^
+      @next.atom? or @next.next.nil?
     end
 
   end
