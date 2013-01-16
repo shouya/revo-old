@@ -16,7 +16,8 @@ module Revo::BuiltInFunctions
     end
 
     def def_macro(name, &block)
-      # TODO: finish this function
+      @table ||= {}
+      @table[name.to_s] = BuiltInMacroType.new(proc2lambda(&block))
     end
 
     def load_symbols(context = Context.global)
@@ -43,7 +44,12 @@ module Revo::BuiltInFunctions
   end
 
   def_function(:write) do |env, args|
+    p args
     puts args.val
     SExpr.new(args)
+  end
+
+  def_macro(:quote) do |env, args|
+    args
   end
 end

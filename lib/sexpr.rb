@@ -32,13 +32,13 @@ module Revo
       self
     end
     def list?
-      @val.is_a? SExpr
+      !atom?
     end
     def atom?
-      !list?
+      @next.nil?
     end
     def eol?
-      @val.is_a? EndOfList
+      (@val.is_a? EndOfList).tap {|x| p "#@val #{@val.class} #{x}"}
     end
     def endlist
       cons self.class.eol_sexpr
@@ -48,7 +48,7 @@ module Revo
       if atom?
         @val.inspect
       else
-        "(#{@val.to_list_string})"
+        "(#{to_list_string})"
       end
     end
 
@@ -64,17 +64,17 @@ module Revo
       # (1 2 3 . 4)
       #          ^
       if @next.nil?
-        ". #{to_s}"
+        ". #{@val.to_s}"
 
       # (1 2 3)
       #      ^
       elsif @next.eol?
-        "#{to_s}"
+        "#{@val.to_s}"
 
       # (1 2 3)
       #    ^
       else
-        "#{to_s} #{@next.to_list_string}"
+        "#{@val.inspect} #{@next.to_list_string}"
       end
     end
 

@@ -22,6 +22,6 @@ BuiltInFunctions.load_symbols(global_context)
 lisp.eval(global_context)
 
 __END__
-(write (+ 1 (+ 2 3)))
+(write (quote (+ 1 1)))
 
 
