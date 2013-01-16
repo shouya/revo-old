@@ -38,7 +38,7 @@ module Revo
       @next.nil?
     end
     def eol?
-      (@val.is_a? EndOfList).tap {|x| p "#@val #{@val.class} #{x}"}
+      @val.is_a? EndOfList
     end
     def endlist
       cons self.class.eol_sexpr
