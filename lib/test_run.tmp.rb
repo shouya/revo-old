@@ -22,8 +22,20 @@ BuiltInFunctions.load_symbols(global_context)
 lisp.eval(global_context)
 
 __END__
+<<<<<<< Updated upstream
 ; (write (+ 1 (+ 2 3)))
 (write '(+ 1 (+ 2 3)))
 
+=======
+<<<<<<< Updated upstream
+(write (quote (+ 1 1)))
+=======
+; (write (+ 1 (+ 2 3)))
+(begin
+   (define a '(1 . 3))
+   (write (cdr a)))
+
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
 
