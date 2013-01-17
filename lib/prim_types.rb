@@ -4,51 +4,37 @@
 
 
 module Revo
-  class EndOfList # '()
-    class << self
-      private :new
-      public
-      def instance
-        @_singleton ||= new
-      end
+  class Literal
+    attr_accessor :val
+    def initialize(val)
+      @val = val
     end
-    def to_s
-      "NIL"
+    def atom?
+      true
+    end
+    def list?
+      false
+    end
+
+    def eval(_)
+      self
     end
   end
 
-  class String
-    attr_accessor :val
-    def initialize(str)
-      @val = str
-    end
+  class String < Literal
     def to_s
       "\"#@val\""
     end
   end
 
-  class Symbol
-    attr_accessor :val
-    def initialize(symbol)
-      @val = symbol
-    end
-    def to_s
-      "'#@val"
-    end
-  end
-
-  class Number
-    attr_accessor :val
-    def initialize(num)
-      @val = num
-    end
+  class Number < Literal
     def to_s
       @val.to_s
     end
   end
 
-  class Char
-    attr_accessor :val
+  # Not supported yet.
+  class Char < Literal
     def initialize(chr)
       if chr.is_a? Integer
         @val = chr
@@ -58,17 +44,6 @@ module Revo
     end
     def to_s
       # TODO: Give a suitable represence for char
-    end
-  end
-
-  class BuiltInFunctionType
-    attr_accessor :val
-    def initialize(lambda_)
-      @val = lambda_
-    end
-    def call(env = Context.global, args = SExpr.eol_sexpr)
-      evaled_args = args.eval_chain(env)
-      @val.call(env, args)
     end
   end
 

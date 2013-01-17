@@ -2,6 +2,9 @@
 require_relative 'prim_types'
 require_relative 'sexpr'
 require_relative 'context'
+require_relative 'function'
+require_relative 'macro'
+
 
 
 module Revo::BuiltInFunctions
@@ -36,19 +39,20 @@ module Revo::BuiltInFunctions
 
 
   def_function(:+) do |env, args|
+    return 0 if args.nil?
     sum = 0
     args.each do |x|
-      sum += x.val.val
+      sum += x.val
     end
-    SExpr.new(Number.new(sum))
+    Number.new(sum)
   end
 
   def_function(:write) do |env, args|
-    puts args.val
-    SExpr.new(args)
+    puts args.car.to_s
+    nil
   end
 
   def_macro(:quote) do |env, args|
-    SExpr.new(args.val)
+    args.car
   end
 end
