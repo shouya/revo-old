@@ -13,17 +13,10 @@ require_relative 'prim_types'
 
 module Revo
   class SExpr
-    class << self
-      def eol_sexpr
-        @eol_expr ||= SExpr.new(EndOfList.instance)
-      end
-    end
-
-
     attr_accessor :next, :val
 
     def initialize(val = nil, next_ = nil)
-      @val = val ? val : EndOfList.instance
+      @val = val
       @next = next_
     end
 
@@ -31,51 +24,62 @@ module Revo
       @next = next_
       self
     end
-    def list?
-      !atom?
-    end
+
     def atom?
-      @next.nil?
+      false
     end
-    def eol?
-      @val.is_a? EndOfList
-    end
-    def endlist
-      cons self.class.eol_sexpr
+    def list?
+      true
     end
 
     def to_s
-      if atom?
-        @val.inspect
-      else
-        "(#{to_list_string})"
-      end
+      "(#{to_list_string})"
+    end
+
+    def car
+      @val
+    end
+
+    def cdr
+      @next
     end
 
     def each(&block)
-      block.call self
-      unless @next.nil? or @next.eol?
-        @next.each(&block)
-      end
+      yield @val
+
+      return if list_tail?
+#      raise 'cannot `each` a pair' if pair_tail?
+
+      @next.each(&block)
     end
 
     protected
     def to_list_string
-      # (1 2 3 . 4)
-      #          ^
-      if @next.nil?
-        ". #{@val.to_s}"
-
-      # (1 2 3)
-      #      ^
-      elsif @next.eol?
+      if list_tail?
         "#{@val.to_s}"
+
+      elsif pair_tail?
+        "#{@val.to_s} . #{@next.to_s}"
 
       # (1 2 3)
       #    ^
       else
-        "#{@val.inspect} #{@next.to_list_string}"
+        "#{@val.to_s} #{@next.to_list_string}"
       end
+    end
+
+    def list_tail?
+      # (1 2 3)
+      #      ^
+      @next.nil?
+    end
+    def pair_tail?
+      # (1 2 3 . 4)
+      #      ^                  ^
+      @next.atom?   # or @next.next.nil?
+
+      # Not (1 2 3 . (1 2)), since it equals to:
+      #     (1 2 3 1 . 2)
     end
 
   end
