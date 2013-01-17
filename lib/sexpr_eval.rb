@@ -10,10 +10,10 @@ class Revo::SExpr
   end
 
   def eval_chain(env)
-    return SExpr.new(@val.eval(env)) if list_tail?
+    return SExpr.new(car.eval(env)) if list_tail?
     #    return SExpr.new(@val.eval(env)).cons(@next.eval(env)) if pair_tail?
 
-    SExpr.new(@val.eval(env)).cons(@next.eval_chain(env))
+    SExpr.new(car.eval(env)).cons(cdr.eval_chain(env))
   end
 
 end

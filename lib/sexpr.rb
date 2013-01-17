@@ -74,9 +74,12 @@ module Revo
       @next.nil?
     end
     def pair_tail?
-      # (1 2 3 . 4) or (1 2 3 . (1 2))
+      # (1 2 3 . 4)
       #      ^                  ^
-      @next.atom? or @next.next.nil?
+      @next.atom?   # or @next.next.nil?
+
+      # Not (1 2 3 . (1 2)), since it equals to:
+      #     (1 2 3 1 . 2)
     end
 
   end

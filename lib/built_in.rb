@@ -3,6 +3,8 @@ require_relative 'prim_types'
 require_relative 'sexpr'
 require_relative 'context'
 require_relative 'function'
+require_relative 'macro'
+
 
 
 module Revo::BuiltInFunctions
@@ -46,11 +48,11 @@ module Revo::BuiltInFunctions
   end
 
   def_function(:write) do |env, args|
-    puts args.val.to_s
+    puts args.car.to_s
     nil
   end
 
   def_macro(:quote) do |env, args|
-    SExpr.new(args.val)
+    args.car
   end
 end
