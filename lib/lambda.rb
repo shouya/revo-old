@@ -5,12 +5,25 @@
 class Revo::Lambda
   attr_accessor :body, :params
 
+  def initialize(params, body)
+    @params = params
+    @body = body
+  end
+
   def call(context = nil, args = nil)
+    evaled_args = args.nil? ? nil : args.eval_chain(context)
+    raw_call(context, evaled_args)
+  end
+
+  def raw_call(context = nil, args = nil)
     private_context = Context.new(context || Context.global)
 
-    private_context.store_lambda_args(construct_args_hash(args))
+    construct_args_hash(args).each do |k, v|
+      private_context.store(k.val, v)
+    end
     body.eval(private_context)
   end
+
 
   private
   def construct_args_hash(args)
@@ -19,17 +32,12 @@ class Revo::Lambda
     arg_ptr = args
 
     while param_ptr
-      break if param_ptr.eol?
-
-      # (name . body)
-      #         ^      deal with this kind of args
-      if param_ptr.next.nil?
-        hsh[param_ptr.val] = arg_ptr
-      end
-
-      arg_ptr = arg_ptr.next
-      param_ptr = param_ptr.next
+      hsh[param_ptr.val] = arg_ptr.car
+      param_ptr = param_ptr.cdr
+      arg_ptr = arg_ptr.cdr
     end
+
+    hsh
   end
 
 end

@@ -4,6 +4,7 @@ require_relative 'sexpr'
 require_relative 'context'
 require_relative 'function'
 require_relative 'macro'
+require_relative 'lambda'
 
 
 
@@ -49,7 +50,7 @@ module Revo::BuiltInFunctions
   def_function(:-) do |env, args|
     return 0 if args.nil?
 
-    diff = args.car
+    diff = args.car.val
     args.cdr.each do |x|
       diff -= x.val
     end
@@ -64,20 +65,26 @@ module Revo::BuiltInFunctions
     Number.new(prod)
   end
   def_function(:/) do |env, args|
-    return 0 if args.nil?
-    quot = args.car
+    return Number.new(0) if args.nil?
+    quot = args.car.val
     args.cdr.each do |x|
       quot /= x
     end
     Number.new(quot)
   end
   def_function(:%) do |env, args|
-    return 0 if args.nil?
-    rem = args.car
+    return Number.new(0) if args.nil?
+    rem = args.car.val
     args.cdr.each do |x|
       rem %= x
     end
     Number.new(rem)
+  end
+  def_function(:==) do |env, args|
+    lhs = args.car
+    rhs = args.cdr.car
+
+    return Bool.new(lhs.val == rhs.val)
   end
 
   def_function(:car) do |env, args|
@@ -89,14 +96,6 @@ module Revo::BuiltInFunctions
 
 
   def_function(:write) do |env, args|
-<<<<<<< Updated upstream
-    puts args.car.to_s
-    nil
-=======
-<<<<<<< Updated upstream
-    puts args.val
-    SExpr.new(args)
-=======
     case args.car
     when nil
       puts '()'
@@ -104,8 +103,6 @@ module Revo::BuiltInFunctions
       puts args.car.to_s
     end
     nil
->>>>>>> Stashed changes
->>>>>>> Stashed changes
   end
 
 
@@ -127,7 +124,22 @@ module Revo::BuiltInFunctions
   end
 
   def_macro(:lambda) do |env, args|
-    
+    lamb_params = args.car
+    lamb_body = SExpr.new(Revo::Symbol.new('begin'))
+                            .cons(args.cdr)
+
+    Lambda.new(lamb_params, lamb_body)
+  end
+  def_macro(:if) do |env, args|
+    cond = args.car.eval(env)
+    true_part = args.cdr.car
+    false_part = args.cdr.cdr
+
+    if cond.nil? or cond.is_false?
+      false_part.eval(env)
+    else
+      true_part.eval(env)
+    end
   end
 
 end

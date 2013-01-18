@@ -15,6 +15,12 @@ module Revo
     def list?
       false
     end
+    def is_true?
+      true
+    end
+    def is_false?
+      !is_true?
+    end
 
     def eval(_)
       self
@@ -44,6 +50,18 @@ module Revo
     end
     def to_s
       # TODO: Give a suitable represence for char
+    end
+  end
+  class Bool < Literal
+    def is_true?
+      @val
+    end
+    def to_s
+      if @val
+        "#t"
+      else
+        "#f"
+      end
     end
   end
 

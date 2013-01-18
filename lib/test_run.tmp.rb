@@ -22,20 +22,21 @@ BuiltInFunctions.load_symbols(global_context)
 lisp.eval(global_context)
 
 __END__
-<<<<<<< Updated upstream
 ; (write (+ 1 (+ 2 3)))
-(write '(+ 1 (+ 2 3)))
+;(begin
+;   (define a '(1 . 3))
+;   (write (cdr a)))
 
-=======
-<<<<<<< Updated upstream
-(write (quote (+ 1 1)))
-=======
-; (write (+ 1 (+ 2 3)))
+;(begin
+;  (define p (lambda (a b) (+ a b)))
+;  (write (p (p 1 2) 3)))
+
 (begin
-   (define a '(1 . 3))
-   (write (cdr a)))
+  (define factorial (lambda (x)
+    (write x)
+    (if (== x 1) 1 (* x (factorial (- x 1))))))
+  (write (factorial 2)))
 
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
 
 
