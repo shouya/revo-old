@@ -50,6 +50,7 @@ rule
 require_relative 'prim_types'
 require_relative 'symbol'
 require_relative 'sexpr'
+require_relative 'scanner'
 
 ---- inner
 attr :scanner

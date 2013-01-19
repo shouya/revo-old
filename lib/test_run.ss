@@ -22,13 +22,18 @@
 ;  (display (plus 1 2 3)))
 
 
-(begin
-  (define-macro mygod
-    (lambda (head . body)
-      (display (list head body))))
-  (mygod (1 2 3) (4 5 6) 7 8 9))
+;(begin
+;  (define-macro mygod
+;    (lambda (head . body)
+;      (display (list head body))))
+;  (mygod (1 2 3) (4 5 6) 7 8 9))
 
 ;(let ((x 1)) (display x))
+
+
+(when (= 1 1)
+      (display "hello")
+      (display "world"))
 
 
 

@@ -5,7 +5,7 @@ require_relative 'context'
 require_relative 'function'
 require_relative 'macro'
 require_relative 'lambda'
-
+require_relative 'parser.tab'
 
 
 module Revo::BuiltInFunctions
@@ -25,13 +25,13 @@ module Revo::BuiltInFunctions
 
     def def_custom_function(name, params_source, body_source)
       params = Parser.parse(params_source)
-      body = Parser.parse(func_source)
-      @table[name.to_s] = Lambda.new(params, body_source)
+      body = Parser.parse(body_source)
+      @table[name.to_s] = Lambda.new(params, body)
     end
     def def_custom_macro(name, params_source, body_source)
       params = Parser.parse(params_source)
-      body = Parser.parse(func_source)
-      @table[name.to_s] = Lambda.new(params, body_source, true)
+      body = Parser.parse(body_source)
+      @table[name.to_s] = Lambda.new(params, body, true)
     end
 
     def call(name, env, args)
@@ -113,9 +113,9 @@ module Revo::BuiltInFunctions
   def_function(:display) do |env, args|
     case args.car
     when nil
-      puts '()'
+      print '()'
     else
-      puts args.car.to_s
+      print args.car.to_s
     end
     nil
   end
@@ -189,6 +189,12 @@ module Revo::BuiltInFunctions
     puts
     nil
   end
+  def_custom_macro(:when, '(cond . body)', <<-'end')
+    (eval (list 'if cond (cons 'begin body) '()))
+  end
 
-
+  def_function(:'debug-print') do |env, args|
+    ap args.to_s
+    nil
+  end
 end
