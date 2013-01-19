@@ -13,7 +13,7 @@
       (if (== x 1)
 	  1
 	  (* x (factorial (- x 1))))))
-  (write (factorial 10)))
+  (write (factorial 575)))
 
 
 
