@@ -32,9 +32,16 @@ class Revo::Lambda
     param_ptr = params
     arg_ptr = args
 
-    while param_ptr
+    loop do
+      break if param_ptr.nil?
+      if param_ptr.atom?
+        hsh[param_ptr] = arg_ptr
+        break
+      end
+
       hsh[param_ptr.val] = arg_ptr.car
       param_ptr = param_ptr.cdr
+
       arg_ptr = arg_ptr.cdr
     end
 

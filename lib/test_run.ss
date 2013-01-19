@@ -15,12 +15,18 @@
 ;	  (* x (factorial (- x 1))))))
 ;  (write (factorial 575)))
 
-
 (begin
-  (define-macro mygod
-    (lambda (head)
-      (write head)))
-  (mygod (1 2 3) (4 5 6) 7 8 9))
+  (define plus
+    (lambda (num . rest)
+      (eval (cons '+ (cons num rest)))))
+  (write (plus 1 2 3)))
+
+
+;(begin
+;  (define-macro mygod
+;    (lambda (head)
+;      (write head)))
+;  (mygod (1 2 3) (4 5 6) 7 8 9))
 
 
 

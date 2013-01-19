@@ -29,12 +29,6 @@ class Revo::Context
     # TODO: Create a custom exception class
     raise "Symbol '#{name}' is not found."
   end
-
-  def store_lambda_args(hsh)
-    hsh.each do |k,v|
-      store(k, v)
-    end
-  end
 end
 
 
