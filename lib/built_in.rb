@@ -101,6 +101,21 @@ module Revo::BuiltInFunctions
 
     return Bool.new(lhs.val == rhs.val)
   end
+  def_function(:<) do |env, args|
+    lhs = args.car
+    rhs = args.cdr.car
+
+    return Bool.new(lhs.val < rhs.val)
+  end
+  def_custom_function(:<=, '(lhs rhs)', <<-'end')
+    (or (= lhs rhs) (< lhs rhs))
+  end
+  def_custom_function(:>, '(lhs rhs)', <<-'end')
+    (not (<= lhs rhs))
+  end
+  def_custom_function(:>=, '(lhs rhs)', <<-'end')
+    (not (< lhs rhs))
+  end
 
   def_function(:car) do |env, args|
     args.car.car
@@ -220,7 +235,6 @@ module Revo::BuiltInFunctions
   def_custom_function(:!=, '(lhs rhs)', <<-'end')
     (not (= lhs rhs))
   end
-  
 
   def_function(:'debug-print') do |env, args|
     puts args.to_s
