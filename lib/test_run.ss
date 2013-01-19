@@ -35,7 +35,8 @@
 ;	(display "hello ")
 ;	(display "world"))
 
-(display (!= 1 2))
+;(display (!= 1 2))
+(display (each '+1 '(1 2 3)))
 
 
 

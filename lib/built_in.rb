@@ -225,6 +225,25 @@ module Revo::BuiltInFunctions
     end
     Bool.new(true)
   end
+  def_function(:map) do |env, args|
+    proc = args.car
+    list = args.cdr.car
+    new_list = SExpr.new(Revo::Symbol.new('head'))
+    new_list_head = new_list
+    list.each do |x|
+      new_list.cons(SExpr.new(proc.call(env, SExpr.new(x))))
+      new_list = new_list.cdr
+    end
+    new_list_head.cdr
+  end
+  def_function(:'for-each') do |env, args|
+    proc = args.car
+    list = args.cdr.car
+    list.each do |x|
+      proc.call(env, SExpr.new(x))
+    end
+    nil
+  end
 
   def_custom_macro(:when, '(cond . body)', <<-'end')
     (eval (list 'if cond (cons 'begin body) ''()))
@@ -235,6 +254,10 @@ module Revo::BuiltInFunctions
   def_custom_function(:!=, '(lhs rhs)', <<-'end')
     (not (= lhs rhs))
   end
+  def_custom_function(:'+1', '(op)', <<-'end')
+    (+ 1 op)
+  end
+
 
   def_function(:'debug-print') do |env, args|
     puts args.to_s
