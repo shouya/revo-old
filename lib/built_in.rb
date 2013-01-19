@@ -156,6 +156,9 @@ module Revo::BuiltInFunctions
   def_function(:cons) do |env, args|
     SExpr.new(args.car).cons(args.cdr.car)
   end
+  def_function(:list) do |env, args|
+    args
+  end
 
   def_function(:eval) do |env, args|
     args.car.eval(env)
