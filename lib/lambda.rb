@@ -3,22 +3,23 @@
 #
 
 class Revo::Lambda
-  attr_accessor :body, :params
+  attr_accessor :body, :params, :is_macro
 
-  def initialize(params, body)
+  def initialize(params, body, is_macro = false)
     @params = params
     @body = body
+    @is_macro = is_macro
   end
 
   def call(context = nil, args = nil)
-    evaled_args = args.nil? ? nil : args.eval_chain(context)
-    raw_call(context, evaled_args)
-  end
-
-  def raw_call(context = nil, args = nil)
+    evaled_args = if is_macro
+                    args
+                  else
+                    args.nil? ? nil : args.eval_chain(context)
+                  end
     private_context = Context.new(context || Context.global)
 
-    construct_args_hash(args).each do |k, v|
+    construct_args_hash(evaled_args).each do |k, v|
       private_context.store(k.val, v)
     end
     body.eval(private_context)

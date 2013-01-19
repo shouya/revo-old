@@ -7,13 +7,20 @@
 ;  (define p (lambda (a b) (+ a b)))
 ;  (write (p (p 1 2) 3)))
 
+;(begin
+;  (define factorial
+;    (lambda (x)
+;      (if (= x 1)
+;	  1
+;	  (* x (factorial (- x 1))))))
+;  (write (factorial 575)))
+
+
 (begin
-  (define factorial
-    (lambda (x)
-      (if (== x 1)
-	  1
-	  (* x (factorial (- x 1))))))
-  (write (factorial 575)))
+  (define-macro mygod
+    (lambda (head)
+      (write head)))
+  (mygod (1 2 3) (4 5 6) 7 8 9))
 
 
 

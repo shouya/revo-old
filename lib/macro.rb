@@ -3,7 +3,7 @@
 
 
 module Revo
-  class BuiltInMacroType
+  class MacroType
     attr_accessor :val
 
     def initialize(lambda_)
@@ -12,8 +12,9 @@ module Revo
     def call(env = Context.global, args = nil)
       @val.call(env, args)
     end
-
   end
+
+  class BuiltInMacroType < MacroType; end
 end
 
 

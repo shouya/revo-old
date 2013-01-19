@@ -3,7 +3,7 @@ require_relative 'context'
 require_relative 'sexpr_eval'
 
 module Revo
-  class BuiltInFunctionType
+  class FunctionType
     attr_accessor :val
     def initialize(lambda_)
       @val = lambda_
@@ -14,5 +14,8 @@ module Revo
       @val.call(env, evaled_args)
     end
   end
+
+  class CustomFunctionType < FunctionType; end
+  class BuiltInFunctionType < FunctionType;  end
 end
 

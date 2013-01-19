@@ -24,6 +24,10 @@ module Revo::BuiltInFunctions
       @table[name.to_s] = BuiltInMacroType.new(proc2lambda(&block))
     end
 
+    def call(name, env, args)
+      @table[name.to_s].call(env, args)
+    end
+
     def load_symbols(context = Context.global)
       @table.each do |k,v|
         context.store(k, v)
@@ -80,7 +84,7 @@ module Revo::BuiltInFunctions
     end
     Number.new(rem)
   end
-  def_function(:==) do |env, args|
+  def_function(:'=') do |env, args|
     lhs = args.car
     rhs = args.cdr.car
 
@@ -140,6 +144,13 @@ module Revo::BuiltInFunctions
     else
       true_part.eval(env)
     end
+  end
+
+  def_macro(:'define-macro') do |env, args|
+    lambda_ = args.cdr.car.eval(env)
+    lambda_.is_macro = true
+    Context.global.store(args.car.val, lambda_)
+    lambda_
   end
 
 end
