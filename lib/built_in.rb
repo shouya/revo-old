@@ -133,7 +133,7 @@ module Revo::BuiltInFunctions
   def_macro(:if) do |env, args|
     cond = args.car.eval(env)
     true_part = args.cdr.car
-    false_part = args.cdr.cdr
+    false_part = args.cdr.cdr.car
 
     if cond.nil? or cond.is_false?
       false_part.eval(env)
