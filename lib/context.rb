@@ -3,6 +3,7 @@
 #
 
 class Revo::Context
+  include Enumerable
   attr_accessor :parent
   attr_accessor :symbols
 
@@ -28,6 +29,14 @@ class Revo::Context
 
     # TODO: Create a custom exception class
     raise "Symbol '#{name}' is not found."
+  end
+
+  def each(&block)
+    if block_given?
+      @symbols.each &block
+    else
+      @symbols.each
+    end
   end
 end
 

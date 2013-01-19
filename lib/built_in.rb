@@ -201,7 +201,7 @@ module Revo::BuiltInFunctions
     context = Context.new(env)
     vars.each do |x|
       context.store(x.car.val, x.cdr.car.eval(env))
-    end
+    end unless vars.nil?
 
     body.eval(context)
   end
@@ -212,10 +212,28 @@ module Revo::BuiltInFunctions
     context = Context.new(env)
     vars.each do |x|
       context.store(x.car.val, x.cdr.car.eval(context))
-    end
+    end unless vars.nil?
 
     body.eval(context)
   end
+  def_macro(:'fluid-let') do |env, args|
+    tmp_area = Context.new(nil)
+
+    keys = []; args.car.each {|x| keys << x.car.val }
+    vals = []; args.car.each {|x| vals << x.cdr.car.eval(env) }
+    keys.zip(vals).each do |k,v|
+      tmp_area.store(k, Context.global.lookup(k))
+      Context.global.store(k, v)
+    end
+
+    retval = call(:let, env, SExpr.new(nil).cons(args.cdr))
+
+    tmp_area.each do |k, v|
+      Context.global.store(k, v)
+    end
+    retval
+  end
+
   def_function(:newline) do |env, args|
     puts
     nil
