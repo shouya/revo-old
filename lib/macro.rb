@@ -12,6 +12,7 @@ module Revo
     def call(env = Context.global, args = nil)
       @val.call(env, args)
     end
+    alias_method :raw_call, :call
   end
 
   class BuiltInMacroType < MacroType; end

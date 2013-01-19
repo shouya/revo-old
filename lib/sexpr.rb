@@ -13,6 +13,20 @@ require_relative 'prim_types'
 
 module Revo
   class SExpr
+    class << self
+      def construct_list(array)
+        construct_pair(array << nil)
+      end
+      def construct_pair(array)
+        return nil if array.empty?
+        list = array[-1]
+        array[0..-2].reverse_each do |x|
+          list = SExpr.new(x).cons(list)
+        end
+        list
+      end
+    end
+
     attr_accessor :next, :val
 
     def initialize(val = nil, next_ = nil)

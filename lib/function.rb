@@ -8,9 +8,11 @@ module Revo
     def initialize(lambda_)
       @val = lambda_
     end
+    def raw_call(env = Context.global, args = nil)
+      @val.call(env, args)
+    end
     def call(env = Context.global, args = nil)
-      evaled_args = args.list? ? args.eval_chain(env) : args.eval(env)
-
+      evaled_args = args.nil? ? nil : args.eval_chain(env)
       @val.call(env, evaled_args)
     end
   end

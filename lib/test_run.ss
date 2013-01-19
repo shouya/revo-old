@@ -36,7 +36,8 @@
 ;	(display "world"))
 
 ;(display (!= 1 2))
-(display (each '+1 '(1 2 3)))
+(for-each (lambda (x y) (display (+ x y)) (newline))
+	  '(1 2 3) '(4 5 6))
 
 
 

@@ -34,10 +34,6 @@ module Revo::BuiltInFunctions
       @table[name.to_s] = Lambda.new(params, body, true)
     end
 
-    def call(name, env, args)
-      @table[name.to_s].call(env, args)
-    end
-
     def load_symbols(context = Context.global)
       @table.each do |k,v|
         context.store(k, v)
@@ -46,10 +42,19 @@ module Revo::BuiltInFunctions
 
     private
     def proc2lambda(&block)
+      @private_funcs ||= {
+        :call => lambda {|name, env, args|
+          BuiltInFunctions.table[name.to_s].raw_call(env, args)
+        }
+      }
+
       Object.new
         .tap {|x| x.define_singleton_method(:x_x, &block) }
+        .tap {|x| @private_funcs
+          .each {|k,v| x.define_singleton_method(k, &v) } }
         .method(:x_x).to_proc
     end
+
   end
   self.instance_variable_set(:@table, {})
 
@@ -227,21 +232,30 @@ module Revo::BuiltInFunctions
   end
   def_function(:map) do |env, args|
     proc = args.car
-    list = args.cdr.car
+    lists = args.cdr
+    rubified_lists = []
+
+    lists.each do |x|
+      tmp = []
+      x.each {|xx| tmp << xx }
+      rubified_lists << tmp
+    end
+
+    pairs = rubified_lists.first.zip(*rubified_lists[1..-1]).map {|x|
+      SExpr.construct_list(x)
+    }
+
     new_list = SExpr.new(Revo::Symbol.new('head'))
     new_list_head = new_list
-    list.each do |x|
-      new_list.cons(SExpr.new(proc.call(env, SExpr.new(x))))
+
+    pairs.each do |x|
+      new_list.cons(SExpr.new(proc.call(env, x)))
       new_list = new_list.cdr
     end
     new_list_head.cdr
   end
   def_function(:'for-each') do |env, args|
-    proc = args.car
-    list = args.cdr.car
-    list.each do |x|
-      proc.call(env, SExpr.new(x))
-    end
+    call(:map, env, args)
     nil
   end
 

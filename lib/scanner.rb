@@ -128,7 +128,7 @@ module Revo
   end
 end
 
-require './scanner_rules'
+require_relative 'scanner_rules'
 
 
 if __FILE__ == $0
