@@ -36,8 +36,15 @@
 ;	(display "world"))
 
 ;(display (!= 1 2))
-(for-each (lambda (x y) (display (+ x y)) (newline))
-	  '(1 2 3) '(4 5 6))
+
+;(for-each (lambda (x y) (display (+ x y)) (newline))
+;	  '(1 2 3) '(4 5 6))
+(begin
+  (define x 20)
+  (display (let ((x 1)
+		 (y x))
+	     (+ x y)))
+  (newline))
 
 
 
