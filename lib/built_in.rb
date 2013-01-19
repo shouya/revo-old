@@ -13,15 +13,25 @@ module Revo::BuiltInFunctions
   class << self
     include Revo
     attr_reader :table
+    attr_reader :custom_func_table
 
     def def_function(name, &block)
-      @table ||= {}
       @table[name.to_s] = BuiltInFunctionType.new(proc2lambda(&block))
     end
 
     def def_macro(name, &block)
-      @table ||= {}
       @table[name.to_s] = BuiltInMacroType.new(proc2lambda(&block))
+    end
+
+    def def_custom_function(name, params_source, body_source)
+      params = Parser.parse(params_source)
+      body = Parser.parse(func_source)
+      @table[name.to_s] = Lambda.new(params, body_source)
+    end
+    def def_custom_macro(name, params_source, body_source)
+      params = Parser.parse(params_source)
+      body = Parser.parse(func_source)
+      @table[name.to_s] = Lambda.new(params, body_source, true)
     end
 
     def call(name, env, args)
@@ -41,6 +51,7 @@ module Revo::BuiltInFunctions
         .method(:x_x).to_proc
     end
   end
+  self.instance_variable_set(:@table, {})
 
 
   def_function(:+) do |env, args|
@@ -99,7 +110,7 @@ module Revo::BuiltInFunctions
   end
 
 
-  def_function(:write) do |env, args|
+  def_function(:display) do |env, args|
     case args.car
     when nil
       puts '()'
@@ -129,8 +140,7 @@ module Revo::BuiltInFunctions
 
   def_macro(:lambda) do |env, args|
     lamb_params = args.car
-    lamb_body = SExpr.new(Revo::Symbol.new('begin'))
-                            .cons(args.cdr)
+    lamb_body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
 
     Lambda.new(lamb_params, lamb_body)
   end
@@ -175,5 +185,10 @@ module Revo::BuiltInFunctions
 
     body.eval(context)
   end
+  def_function(:newline) do |env, args|
+    puts
+    nil
+  end
+
 
 end

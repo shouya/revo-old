@@ -69,6 +69,10 @@ def on_error(t, sym, stack)
   abort
 end
 
+def self.parse(str)
+  new(Scanner.new.tap{|x| x.scan_string(str) }).do_parse
+end
+
 private
 def print_context(line_no, column_no, context)
   source = @scanner.source
