@@ -98,6 +98,13 @@ module Revo
       return result
     end
 
+    def column_no
+      @scanner.pos - @column_no
+    end
+    def source
+      @scanner.string.dup
+    end
+
     private
     def match_rule
       self.class.rules.select {|x| x[1] == @state }.detect do |x|
@@ -108,10 +115,6 @@ module Revo
     def scan_pattern(pat)
       @scanner.scan(pat)
       @match = @scanner.matched
-    end
-
-    def column_no
-      @scanner.pos - @column_no
     end
 
     def parse_int(str)

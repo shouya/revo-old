@@ -1,5 +1,3 @@
-
-
 ; (write (+ 1 (+ 2 3)))
 ;(begin
 ;   (define a '(1 . 3))
@@ -16,7 +14,6 @@
 	  1
 	  (* x (factorial (- x 1))))))
   (write (factorial 10)))
-
 
 
 

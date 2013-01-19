@@ -2,7 +2,7 @@
 
 module Revo
   class Scanner
-    rule(/\s+/) { :PASS }
+    rule(/[ \t]+/) { :PASS }
     rule(/\r\n|\r|\n/) { increase_line_number; :PASS }
 
     symbol_rule(';') { @state = :COMMENT; :PASS }

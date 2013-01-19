@@ -61,4 +61,30 @@ def next_token
   @scanner.next_token
 end
 
+def on_error(t, sym, stack)
+  print "Syntax error at "
+  puts "#{@scanner.filename}:#{@scanner.line_no}:#{@scanner.column_no}:"
+  print_context(@scanner.line_no, @scanner.column_no, 3)
+  puts "Unexpected token '#{sym}'."
+  abort
+end
+
+private
+def print_context(line_no, column_no, context)
+  source = @scanner.source
+  source_lines = source.lines.count
+  range_beg = line_no - context < 0 ? line_no : line_no - context
+  range_end = line_no + context >= source_lines ? source_lines - 1 \
+              : line_no + context
+
+  range_beg.upto(line_no) do |l|
+    puts "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}"
+  end
+
+  puts "#{'-' * 3}--#{'-' * column_no}^"
+
+  (line_no + 1).upto(range_end) do |l|
+    puts "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}"
+  end
+end
 
