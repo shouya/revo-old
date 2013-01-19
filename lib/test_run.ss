@@ -22,11 +22,13 @@
 ;  (write (plus 1 2 3)))
 
 
-(begin
-  (define-macro mygod
-    (lambda (head . body)
-      (write (list head body))))
-  (mygod (1 2 3) (4 5 6) 7 8 9))
+;(begin
+;  (define-macro mygod
+;    (lambda (head . body)
+;      (write (list head body))))
+;  (mygod (1 2 3) (4 5 6) 7 8 9))
+
+(let ((x 1)) (write x))
 
 
 

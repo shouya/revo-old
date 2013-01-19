@@ -164,4 +164,16 @@ module Revo::BuiltInFunctions
     args.car.eval(env)
   end
 
+  def_macro(:let) do |env, args|
+    vars = args.car
+    body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
+
+    context = Context.new(env)
+    vars.each do |x|
+      context.store(x.car.val, x.cdr.car)
+    end
+
+    body.eval(context)
+  end
+
 end
