@@ -28,7 +28,7 @@ module Revo
 #    symbol_rule('\0[xX]\d+') {  }
     rule(/./, :DSTR)         { @buffer[:str] << @match; :PASS }
 
-    rule(/[\w_\-\@\?\$\%\^\*\+\/\~\=\<\>]+/) { [:SYMBOL, @match] }
+    rule(/[\w_\-\@\?\$\%\^\*\+\/\~\=\<\>\!]+/) { [:SYMBOL, @match] }
 
   end
 end

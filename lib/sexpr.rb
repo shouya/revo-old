@@ -31,10 +31,17 @@ module Revo
     def list?
       true
     end
+    def is_true?
+      true
+    end
+    def is_false?
+      false
+    end
 
-    def to_s
+    def inspect
       "(#{to_list_string})"
     end
+    alias_method :to_s, :inspect
 
     def car
       @val
@@ -55,16 +62,18 @@ module Revo
 
     protected
     def to_list_string
+      def @val.inspect ; '()'; end if @val.nil?
+
       if list_tail?
-        "#{@val.to_s}"
+        "#{@val.inspect}"
 
       elsif pair_tail?
-        "#{@val.to_s} . #{@next.to_s}"
+        "#{@val.inspect} . #{@next.inspect}"
 
       # (1 2 3)
       #    ^
       else
-        "#{@val.to_s} #{@next.to_list_string}"
+        "#{@val.inspect} #{@next.to_list_string}"
       end
     end
 

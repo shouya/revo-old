@@ -5,9 +5,10 @@ require_relative 'context'
 
 module Revo
   class Symbol < Literal
-    def to_s
+    def inspect
       "#@val"
     end
+    alias_method :to_s, :inspect
 
     def eval(env)
       env.lookup(@val)

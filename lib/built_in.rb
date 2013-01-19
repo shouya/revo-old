@@ -189,12 +189,41 @@ module Revo::BuiltInFunctions
     puts
     nil
   end
-  def_custom_macro(:when, '(cond . body)', <<-'end')
-    (eval (list 'if cond (cons 'begin body) '()))
+  def_function(:not) do |env, args|
+    if args.car.is_true?
+      Bool.new(false)
+    else
+      Bool.new(true)
+    end
+  end
+  def_macro(:or) do |env, args|
+    args.each do |x|
+      result = x.eval(env)
+      return result if result.is_true?
+    end
+    Bool.new(false)
+  end
+  def_macro(:and) do |env, args|
+    args.each do |x|
+      result = x.eval(env)
+      return result if result.is_false?
+    end
+    Bool.new(true)
   end
 
+  def_custom_macro(:when, '(cond . body)', <<-'end')
+    (eval (list 'if cond (cons 'begin body) ''()))
+  end
+  def_custom_macro(:unless, '(cond . body)', <<-'end')
+    (debug-print (list 'if cond ''() (cons 'begin body)))
+  end
+  def_custom_function(:!=, '(lhs rhs)', <<-'end')
+    (not (= lhs rhs))
+  end
+  
+
   def_function(:'debug-print') do |env, args|
-    ap args.to_s
+    puts args.to_s
     nil
   end
 end

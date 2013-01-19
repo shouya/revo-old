@@ -21,6 +21,9 @@ module Revo
     def is_false?
       !is_true?
     end
+    def inspect
+      @val.inspect
+    end
 
     def eval(_)
       self
@@ -29,7 +32,7 @@ module Revo
 
   class String < Literal
     def to_s
-      "\"#@val\""
+      @val
     end
   end
 

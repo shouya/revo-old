@@ -31,9 +31,11 @@
 ;(let ((x 1)) (display x))
 
 
-(when (= 1 1)
-      (display "hello")
-      (display "world"))
+;(unless (= 1 1)
+;	(display "hello ")
+;	(display "world"))
+
+(display (!= 1 2))
 
 
 
