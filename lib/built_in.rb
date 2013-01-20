@@ -195,17 +195,41 @@ module Revo::BuiltInFunctions
   end
 
   def_macro(:let) do |env, args|
+    named_let = nil
+    if !args.car.nil? and args.car.atom?
+      named_let = args.car.val
+      args = args.cdr
+    end
     vars = args.car
     body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
 
     context = Context.new(env)
+    params = []
     vars.each do |x|
+      params << x.car unless named_let.nil?
       context.store(x.car.val, x.cdr.car.eval(env))
     end unless vars.nil?
+
+    unless named_let.nil?
+      context.store(named_let,
+                    Lambda.new(SExpr.construct_list(params), body))
+    end
 
     body.eval(context)
   end
   def_macro(:'let*') do |env, args|
+    vars = args.car
+    body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
+
+    context = Context.global
+    vars.each do |x|
+      context = Context.new(context)
+      context.store(x.car.val, x.cdr.car.eval(context))
+    end unless vars.nil?
+
+    body.eval(context)
+  end
+  def_macro(:letrec) do |env, args|
     vars = args.car
     body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
 

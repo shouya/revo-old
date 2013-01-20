@@ -46,16 +46,44 @@
 ;	     (+ x y)))
 ;  (newline))
 
+;(begin
+;  (define counter 1)
+;  (define bump-counter
+;    (lambda ()
+;      (define counter (+ counter 1))
+;      counter))
+;  (fluid-let ((counter 99))
+;    (display (bump-counter)) (newline)
+;    (display (bump-counter)) (newline)
+;    (display (bump-counter)) (newline))
+;  (display counter))
+
 (begin
-  (define counter 1)
-  (define bump-counter
-    (lambda ()
-      (define counter (+ counter 1))
-      counter))
-  (fluid-let ((counter 99))
-    (display (bump-counter)) (newline)
-    (display (bump-counter)) (newline)
-    (display (bump-counter)) (newline))
-  (display counter))
+  (define x 20)
+  (define y 30)
+  (let ((x y)
+	(y x))
+    (display (+ x y)))
+  (newline)
+  (let* ((x y)
+	 (y x))
+    (display (+ x y)))
+  (newline)
+  (letrec ((local-even? (lambda (n)
+			  (if (= n 0) #t
+			      (local-odd? (- n 1)))))
+	   (local-odd? (lambda (n)
+			 (if (= n 0) #f
+			     (local-even? (- n 1))))))
+    (display (list (local-even? 23) (local-odd? 23))))
+  (newline)
+  (display (let countdown ((i 10))
+	     (if (= i 0) 'liftoff
+		 (begin
+		   (display i)
+		   (newline)
+		   (countdown (- i 1))))))
+  (newline))
+
 
 
