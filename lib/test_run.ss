@@ -86,6 +86,12 @@
 ;  (newline))
 
 ;(display (reverse '(1 2 (3 4))))
+
+;TODO: not working
+;(for-each display
+;	  (map type-of
+;	       (list 1 "a" '())))
+
 (begin
   (define x '(1 2))
   (set-car! x "what?")

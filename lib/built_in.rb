@@ -154,15 +154,21 @@ module Revo::BuiltInFunctions
   end
   def_macro(:'set-car!') do |env, args|
     name = args.car.val
-    val = Context.global.lookup(args.car.val)
-    Context.global.store(name,
-                         SExpr.new(args.cdr.car.eval(env)).cons(val.cdr))
+    orig_context = env.lookup_context(name)
+    val = orig_context.lookup(name)
+    new_val = SExpr.new(args.cdr.car.eval(env)).cons(val.cdr)
+
+    orig_context.store(name, new_val)
+    nil
   end
   def_macro(:'set-cdr!') do |env, args|
     name = args.car.val
-    val = Context.global.lookup(args.car.val)
-    Context.global.store(name,
-                         SExpr.new(val.car).cons(args.cdr.car.eval(env)))
+    orig_context = env.lookup_context(name)
+    val = orig_context.lookup(name)
+    new_val = SExpr.new(val.car).cons(args.cdr.car.eval(env))
+
+    orig_context.store(name, new_val)
+    nil
   end
 
   def_macro(:begin) do |env, args|
@@ -209,7 +215,7 @@ module Revo::BuiltInFunctions
     args.car.eval(env)
   end
   def_function(:'type-of') do |env, args|
-    type = case args.car.val
+    type = case args.car
            when nil
              'null'
            when Revo::String

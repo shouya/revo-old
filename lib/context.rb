@@ -31,6 +31,13 @@ class Revo::Context
     raise "Symbol '#{name}' is not found."
   end
 
+  def lookup_context(name)
+    return self if @symbols.key? name
+    return @parent.lookup_context(name) if @parent
+
+    raise "Symbol '#{name}' is not found."
+  end
+
   def each(&block)
     if block_given?
       @symbols.each &block
