@@ -1,10 +1,10 @@
 
 
-require_relative 'prim_types'
 require_relative 'context'
+require_relative 'value'
 
 module Revo
-  class Symbol < Literal
+  class Symbol < ValueClass
     def inspect
       "#@val"
     end

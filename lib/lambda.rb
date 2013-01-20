@@ -2,7 +2,9 @@
 # Lambda function
 #
 
-class Revo::Lambda
+require_relative 'value'
+
+class Revo::Lambda < Revo::ValueClass
   attr_accessor :body, :params, :is_macro
 
   def initialize(params, body, is_macro = false)

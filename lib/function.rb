@@ -1,13 +1,10 @@
 
 require_relative 'context'
 require_relative 'sexpr_eval'
+require_relative 'value'
 
 module Revo
-  class FunctionType
-    attr_accessor :val
-    def initialize(lambda_)
-      @val = lambda_
-    end
+  class FunctionType < ValueClass
     def raw_call(env = Context.global, args = NULL)
       @val.call(env, args)
     end

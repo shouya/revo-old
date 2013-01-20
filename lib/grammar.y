@@ -79,9 +79,13 @@ private
 def print_context(line_no, column_no, context)
   source = @scanner.source
   source_lines = source.lines.count
-  range_beg = line_no - context < 0 ? line_no : line_no - context
+
+  range_beg = line_no - context < 0 ? 0 : line_no - context
   range_end = line_no + context >= source_lines ? source_lines - 1 \
               : line_no + context
+
+  line_no = range_beg if line_no < range_beg
+  line_no = range_end if line_no > range_end
 
   range_beg.upto(line_no) do |l|
     puts "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}"

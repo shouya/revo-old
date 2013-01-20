@@ -1,10 +1,11 @@
 
+require_relative 'value'
 
 module Revo
-  class NullClass
+  class NullClass < ValueClass
     class << self
       def null
-        @instance ||= new
+        @instance ||= new(nil)
       end
 
       private :new

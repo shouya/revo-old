@@ -2,48 +2,23 @@
 # Primitive Types of Revo
 #
 
+require_relative 'value'
 
 module Revo
-  class Literal
-    attr_accessor :val
-    def initialize(val)
-      @val = val
-    end
-    def atom?
-      true
-    end
-    def list?
-      false
-    end
-    def is_true?
-      true
-    end
-    def is_false?
-      !is_true?
-    end
-    def inspect
-      @val.inspect
-    end
-
-    def eval(_)
-      self
-    end
-  end
-
-  class String < Literal
+  class String < ValueClass
     def to_s
       @val
     end
   end
 
-  class Number < Literal
+  class Number < ValueClass
     def to_s
       @val.to_s
     end
   end
 
   # Not supported yet.
-  class Char < Literal
+  class Char < ValueClass
     def initialize(chr)
       if chr.is_a? Integer
         @val = chr
@@ -55,7 +30,7 @@ module Revo
       # TODO: Give a suitable represence for char
     end
   end
-  class Bool < Literal
+  class Bool < ValueClass
     def is_true?
       @val
     end

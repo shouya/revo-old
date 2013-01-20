@@ -86,7 +86,7 @@
 ;		   (countdown (- i 1))))))
 ;  (newline))
 
-;(display (reverse '(1 2 (3 4))))
+(display (reverse '(1 2 (3 4))))
 
 ;TODO: not working
 ;(for-each display

@@ -13,7 +13,7 @@ require_relative 'prim_types'
 require_relative 'null'
 
 module Revo
-  class SExpr
+  class SExpr < ValueClass
     class << self
       def construct_list(array)
         construct_pair(array << NULL)
@@ -43,17 +43,8 @@ module Revo
     def atom?
       false
     end
-    def list?
-      true
-    end
     def is_true?
       true
-    end
-    def is_false?
-      false
-    end
-    def null?
-      false
     end
 
     def inspect
@@ -64,7 +55,6 @@ module Revo
     def car
       @val
     end
-
     def cdr
       @next
     end
