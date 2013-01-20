@@ -60,7 +60,6 @@ module Revo::BuiltInFunctions
 
 
   def_function(:+) do |env, args|
-    return 0 if args.nil?
     sum = 0
     args.each do |x|
       sum += x.val
@@ -68,8 +67,7 @@ module Revo::BuiltInFunctions
     Number.new(sum)
   end
   def_function(:-) do |env, args|
-    return 0 if args.nil?
-
+    # TODO: deal with negative operator
     diff = args.car.val
     args.cdr.each do |x|
       diff -= x.val
@@ -77,7 +75,6 @@ module Revo::BuiltInFunctions
     Number.new(diff)
   end
   def_function(:*) do |env, args|
-    return 0 if args.nil?
     prod = 1
     args.each do |x|
       prod *= x.val
@@ -85,7 +82,7 @@ module Revo::BuiltInFunctions
     Number.new(prod)
   end
   def_function(:/) do |env, args|
-    return Number.new(0) if args.nil?
+    # TODO: deal with the NULL condition
     quot = args.car.val
     args.cdr.each do |x|
       quot /= x
@@ -93,7 +90,7 @@ module Revo::BuiltInFunctions
     Number.new(quot)
   end
   def_function(:%) do |env, args|
-    return Number.new(0) if args.nil?
+    # TODO: deal with the NULL condition
     rem = args.car.val
     args.cdr.each do |x|
       rem %= x
@@ -131,13 +128,10 @@ module Revo::BuiltInFunctions
 
 
   def_function(:display) do |env, args|
-    case args.car
-    when nil
-      print '()'
-    else
+    unless args.null?
       print args.car.to_s
     end
-    nil
+    NULL
   end
 
 
@@ -159,7 +153,7 @@ module Revo::BuiltInFunctions
     new_val = SExpr.new(args.cdr.car.eval(env)).cons(val.cdr)
 
     orig_context.store(name, new_val)
-    nil
+    NULL
   end
   def_macro(:'set-cdr!') do |env, args|
     name = args.car.val
@@ -168,11 +162,12 @@ module Revo::BuiltInFunctions
     new_val = SExpr.new(val.car).cons(args.cdr.car.eval(env))
 
     orig_context.store(name, new_val)
-    nil
+    NULL
   end
 
   def_macro(:begin) do |env, args|
-    lastval = nil
+    lastval = NULL
+
     args.each do |x|
       lastval = x.eval(env)
     end
@@ -190,7 +185,7 @@ module Revo::BuiltInFunctions
     true_part = args.cdr.car
     false_part = args.cdr.cdr.car
 
-    if cond.nil? or cond.is_false?
+    if cond.is_false?
       false_part.eval(env)
     else
       true_part.eval(env)
@@ -216,7 +211,7 @@ module Revo::BuiltInFunctions
   end
   def_function(:'type-of') do |env, args|
     type = case args.car
-           when nil
+           when NULL
              'null'
            when Revo::String
              'string'
@@ -242,7 +237,7 @@ module Revo::BuiltInFunctions
 
   def_macro(:let) do |env, args|
     named_let = nil
-    if !args.car.nil? and args.car.atom?
+    if args.car.atom?
       named_let = args.car.val
       args = args.cdr
     end
@@ -254,7 +249,7 @@ module Revo::BuiltInFunctions
     vars.each do |x|
       params << x.car unless named_let.nil?
       context.store(x.car.val, x.cdr.car.eval(env))
-    end unless vars.nil?
+    end unless vars.null?
 
     unless named_let.nil?
       context.store(named_let,
@@ -271,7 +266,7 @@ module Revo::BuiltInFunctions
     vars.each do |x|
       context = Context.new(context)
       context.store(x.car.val, x.cdr.car.eval(context))
-    end unless vars.nil?
+    end unless vars.null?
 
     body.eval(context)
   end
@@ -282,7 +277,7 @@ module Revo::BuiltInFunctions
     context = Context.new(env)
     vars.each do |x|
       context.store(x.car.val, x.cdr.car.eval(context))
-    end unless vars.nil?
+    end unless vars.null?
 
     body.eval(context)
   end
@@ -296,7 +291,7 @@ module Revo::BuiltInFunctions
       Context.global.store(k, v)
     end
 
-    retval = call(:let, env, SExpr.new(nil).cons(args.cdr))
+    retval = call(:let, env, SExpr.new(NULL).cons(args.cdr))
 
     tmp_area.each do |k, v|
       Context.global.store(k, v)
@@ -306,7 +301,7 @@ module Revo::BuiltInFunctions
 
   def_function(:newline) do |env, args|
     puts
-    nil
+    NULL
   end
   def_function(:not) do |env, args|
     if args.car.is_true?
@@ -355,14 +350,14 @@ module Revo::BuiltInFunctions
   end
   def_function(:'for-each') do |env, args|
     call(:map, env, args)
-    nil
+    NULL
   end
 
   def_custom_macro(:when, '(cond . body)', <<-'end')
     (eval (list 'if cond (cons 'begin body) ''()))
   end
   def_custom_macro(:unless, '(cond . body)', <<-'end')
-    (debug-print (list 'if cond ''() (cons 'begin body)))
+    (eval (list 'if cond ''() (cons 'begin body)))
   end
   def_custom_function(:!=, '(lhs rhs)', <<-'end')
     (not (= lhs rhs))
@@ -384,6 +379,6 @@ module Revo::BuiltInFunctions
 
   def_function(:'debug-print') do |env, args|
     puts args.to_s
-    nil
+    NULL
   end
 end

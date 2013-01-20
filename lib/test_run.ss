@@ -1,4 +1,4 @@
-; (display (+ 1 (+ 2 3)))
+;(display (+ 1 (+ 2 3)))
 ;(begin
 ;   (define a '(1 . 3))
 ;   (display (cdr a)))
@@ -31,14 +31,15 @@
 ;(let ((x 1)) (display x))
 
 
-;(unless (= 1 1)
-;	(display "hello ")
-;	(display "world"))
+;(when (= 1 1)
+;      (display "hello ")
+;      (display "world"))
 
 ;(display (!= 1 2))
 
 ;(for-each (lambda (x y) (display (+ x y)) (newline))
 ;	  '(1 2 3) '(4 5 6))
+
 ;(begin
 ;  (define x 20)
 ;  (display (let ((x 1)
@@ -92,12 +93,12 @@
 ;	  (map type-of
 ;	       (list 1 "a" '())))
 
-(begin
-  (define x '(1 2))
-  (set-car! x "what?")
-  (set-cdr! x (cons (car x) '()))
-  (display x)
-  (newline))
+;(begin
+;  (define x '(1 2))
+;  (set-car! x "what?")
+;  (set-cdr! x (cons (car x) '()))
+;  (display x)
+;  (newline))
 
 
 

@@ -7,16 +7,13 @@ class Revo::Lambda
 
   def initialize(params, body, is_macro = false)
     @params = params
+
     @body = body
     @is_macro = is_macro
   end
 
-  def call(context = nil, args = nil)
-    evaled_args = if is_macro
-                    args
-                  else
-                    args.nil? ? nil : args.eval_chain(context)
-                  end
+  def call(context = nil, args = NULL)
+    evaled_args = is_macro ? args : args.eval_chain(context)
     private_context = Context.new(context || Context.global)
 
     construct_args_hash(evaled_args).each do |k, v|
@@ -33,11 +30,11 @@ class Revo::Lambda
     arg_ptr = args
 
     loop do
-      break if param_ptr.nil?
       if param_ptr.atom?
         hsh[param_ptr] = arg_ptr
         break
       end
+      break if param_ptr.null?
 
       hsh[param_ptr.val] = arg_ptr.car
       param_ptr = param_ptr.cdr

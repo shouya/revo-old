@@ -38,7 +38,7 @@ rule
              | quoted_expr                     { val[0] }
 
 
- list_content: /* empty */       { nil }
+ list_content: /* empty */       { NULL }
              | expr list_content { SExpr.new(val[0]).cons(val[1]) }
 
   quoted_expr: QUOTE expr        {

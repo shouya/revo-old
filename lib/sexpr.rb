@@ -10,15 +10,16 @@
 
 
 require_relative 'prim_types'
+require_relative 'null'
 
 module Revo
   class SExpr
     class << self
       def construct_list(array)
-        construct_pair(array << nil)
+        construct_pair(array << NULL)
       end
       def construct_pair(array)
-        return nil if array.empty?
+        return NULL if array.empty?
         list = array[-1]
         array[0..-2].reverse_each do |x|
           list = SExpr.new(x).cons(list)
@@ -29,7 +30,7 @@ module Revo
 
     attr_accessor :next, :val
 
-    def initialize(val = nil, next_ = nil)
+    def initialize(val = nil, next_ = NULL)
       @val = val
       @next = next_
     end
@@ -49,6 +50,9 @@ module Revo
       true
     end
     def is_false?
+      false
+    end
+    def null?
       false
     end
 
@@ -76,13 +80,11 @@ module Revo
 
     protected
     def to_list_string
-      def @val.inspect ; '()'; end if @val.nil?
-
-      if list_tail?
-        "#{@val.inspect}"
-
-      elsif pair_tail?
+      if pair_tail?
         "#{@val.inspect} . #{@next.inspect}"
+
+      elsif list_tail?
+        "#{@val.inspect}"
 
       # (1 2 3)
       #    ^
@@ -94,7 +96,7 @@ module Revo
     def list_tail?
       # (1 2 3)
       #      ^
-      @next.nil?
+      @next.null?
     end
     def pair_tail?
       # (1 2 3 . 4)

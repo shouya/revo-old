@@ -9,7 +9,7 @@ module Revo
     def initialize(lambda_)
       @val = lambda_
     end
-    def call(env = Context.global, args = nil)
+    def call(env = Context.global, args = NULL)
       @val.call(env, args)
     end
     alias_method :raw_call, :call
