@@ -21,6 +21,8 @@ module Revo
 
     rule(/\d+\.\d*/) { [:FLOAT, parse_float(@match)] }
     rule(/\d+/)      { [:INTEGER, parse_int(@match)] }
+    rule(/\#[tT]/)   { [:BOOLEAN, true] }
+    rule(/\#[fF]/)   { [:BOOLEAN, false] }
 
     symbol_rule('"')         { @state = :DSTR; @buffer[:str] = ''; :PASS }
     symbol_rule('\"', :DSTR) { @buffer[:str] << '"'; :PASS }

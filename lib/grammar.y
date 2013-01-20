@@ -19,6 +19,7 @@ rule
              | INTEGER  { Number.new(val[0]) }
              | FLOAT    { Number.new(val[0]) }
              | SYMBOL   { Symbol.new(val[0]) }
+             | BOOLEAN  { Bool.new(val[0]) }
 
          expr: literal  { val[0] }
              | list     { val[0] }
