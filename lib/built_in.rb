@@ -146,10 +146,25 @@ module Revo::BuiltInFunctions
   end
 
   def_macro(:define) do |env, args|
+    name = args.car.val
     val = args.cdr.car.eval(env)
-    Context.global.store(args.car.val, val)
+    #    Context.global.lookup(name)
+    Context.global.store(name, val)
     val
   end
+  def_macro(:'set-car!') do |env, args|
+    name = args.car.val
+    val = Context.global.lookup(args.car.val)
+    Context.global.store(name,
+                         SExpr.new(args.cdr.car.eval(env)).cons(val.cdr))
+  end
+  def_macro(:'set-cdr!') do |env, args|
+    name = args.car.val
+    val = Context.global.lookup(args.car.val)
+    Context.global.store(name,
+                         SExpr.new(val.car).cons(args.cdr.car.eval(env)))
+  end
+
   def_macro(:begin) do |env, args|
     lastval = nil
     args.each do |x|
@@ -192,6 +207,31 @@ module Revo::BuiltInFunctions
 
   def_function(:eval) do |env, args|
     args.car.eval(env)
+  end
+  def_function(:'type-of') do |env, args|
+    type = case args.car.val
+           when nil
+             'null'
+           when Revo::String
+             'string'
+           when Revo::Symbol
+             'symbol'
+           when Revo::Bool
+             'bool'
+           when Revo::Number
+             'number'
+           when Revo::SExpr
+             'list'
+           when Revo::MacroType
+             'macro'
+           when Revo::FunctionType
+             'function'
+           when Revo::Lambda
+             'lambda'
+           else
+             'unknown'
+           end
+    Revo::Symbol.new(type)
   end
 
   def_macro(:let) do |env, args|
@@ -323,6 +363,16 @@ module Revo::BuiltInFunctions
   end
   def_custom_function(:'+1', '(op)', <<-'end')
     (+ 1 op)
+  end
+  def_custom_function(:reverse, '(s)', <<-'end')
+    (let loop ((s s) (r '()))
+      (if (null? s) r
+	  (let ((d (cdr s)))
+            (set-cdr! s r)
+	    (loop d s))))
+  end
+  def_custom_function(:null?, '(op)', <<-'end')
+    (= (type-of op) 'null)
   end
 
 
