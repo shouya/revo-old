@@ -67,8 +67,9 @@ module Revo::BuiltInFunctions
     Number.new(sum)
   end
   def_function(:-) do |env, args|
-    # TODO: deal with negative operator
     diff = args.car.val
+    return Number.new(-diff) if args.cdr.null?
+
     args.cdr.each do |x|
       diff -= x.val
     end
@@ -82,21 +83,13 @@ module Revo::BuiltInFunctions
     Number.new(prod)
   end
   def_function(:/) do |env, args|
-    # TODO: deal with the NULL condition
     quot = args.car.val
     args.cdr.each do |x|
       quot /= x
     end
     Number.new(quot)
   end
-  def_function(:%) do |env, args|
-    # TODO: deal with the NULL condition
-    rem = args.car.val
-    args.cdr.each do |x|
-      rem %= x
-    end
-    Number.new(rem)
-  end
+
   def_function(:'=') do |env, args|
     lhs = args.car
     rhs = args.cdr.car
