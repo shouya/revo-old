@@ -328,9 +328,8 @@ module Revo::BuiltInFunctions
       rubified_lists << tmp
     end
 
-    pairs = rubified_lists.first.zip(*rubified_lists[1..-1]).map {|x|
-      SExpr.construct_list(x)
-    }
+    pairs = rubified_lists.first
+      .zip(*rubified_lists[1..-1]).map {|x| SExpr.construct_list(x) }
 
     new_list = SExpr.new(Revo::Symbol.new('head'))
     new_list_head = new_list
@@ -370,8 +369,7 @@ module Revo::BuiltInFunctions
   end
 
 
-  def_function(:'debug-print') do |env, args|
-    puts args.to_s
-    NULL
+  def_function(:'debug-format') do |env, args|
+    String.new(args.car.inspect)
   end
 end

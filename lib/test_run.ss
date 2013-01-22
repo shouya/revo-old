@@ -86,12 +86,14 @@
 ;		   (countdown (- i 1))))))
 ;  (newline))
 
-(display (reverse '(1 2 (3 4))))
+;(display (reverse '(1 2 (3 4))))
 
-;TODO: not working
-;(for-each display
-;	  (map type-of
-;	       (list 1 "a" '())))
+(for-each (lambda (x)
+	    (display (debug-format x))
+	    (display "  --  ")
+	    (display (type-of x))
+	    (newline))
+	  '('a 2 "3" '(4) '() #t (lambda (x) (x))))
 
 ;(begin
 ;  (define x '(1 2))
