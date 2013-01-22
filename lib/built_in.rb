@@ -33,6 +33,10 @@ module Revo::BuiltInFunctions
       body = Parser.parse(body_source)
       @table[name.to_s] = Lambda.new(params, body, true)
     end
+    def def_alias(new_name, old_name)
+      @table[new_name.to_s] = @table[old_name.to_s]
+    end
+
 
     def load_symbols(context = Context.global)
       @table.each do |k,v|
@@ -367,6 +371,14 @@ module Revo::BuiltInFunctions
   def_custom_function(:null?, '(op)', <<-'end')
     (= (type-of op) 'null)
   end
+  def_function(:quit) do |env, args|
+    exit
+    nil
+  end
+
+  def_alias(:progn, :begin)
+  def_alias(:exit, :quit)
+  
 
 
   def_function(:'debug-format') do |env, args|
