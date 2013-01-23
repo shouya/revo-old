@@ -12,6 +12,9 @@ module Revo
   end
 
   class Number < ValueClass
+    def ==(another)
+      @val == another.val
+    end
     def to_s
       @val.to_s
     end

@@ -5,6 +5,7 @@
 require_relative 'value'
 
 class Revo::Lambda < Revo::ValueClass
+  include Revo
   attr_accessor :body, :params, :is_macro
 
   def initialize(params, body, is_macro = false)

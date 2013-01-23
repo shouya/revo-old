@@ -35,6 +35,10 @@ module Revo
       @next = next_
     end
 
+    def ==(another)
+      @val == another.val and @next == another.next
+    end
+
     def cons(next_)
       @next = next_
       self

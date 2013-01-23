@@ -9,6 +9,7 @@ require_relative 'parser.tab'
 
 
 module Revo::BuiltInFunctions
+  include Revo
 
   class << self
     include Revo
@@ -89,7 +90,7 @@ module Revo::BuiltInFunctions
   def_function(:/) do |env, args|
     quot = args.car.val
     args.cdr.each do |x|
-      quot /= x
+      quot /= x.val
     end
     Number.new(quot)
   end
