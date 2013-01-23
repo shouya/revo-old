@@ -63,6 +63,7 @@ module Revo
       @next
     end
 
+    include Enumerable
     def each(&block)
       yield @val
 

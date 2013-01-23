@@ -88,12 +88,15 @@
 
 ;(display (reverse '(1 2 (3 4))))
 
-(for-each (lambda (x)
-	    (display (debug-format x))
-	    (display "  --  ")
-	    (display (type-of x))
-	    (newline))
-	  '('a 2 "3" '(4) '() #t (lambda (x) (x))))
+;(for-each (lambda (x)
+;	    (display (debug-format x))
+;	    (display "  --  ")
+;	    (display (type-of x))
+;	    (newline))
+;	  '('a 2 "3" '(4) '() #t (lambda (x) (x))))
+
+;(display (fold-right + 0 '(1 2 3)))
+(display (fold-left + 0 '(1 2 3)))
 
 ;(begin
 ;  (define x '(1 2))

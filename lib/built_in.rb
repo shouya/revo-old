@@ -377,10 +377,28 @@ module Revo::BuiltInFunctions
     nil
   end
 
+  def_function(:'fold-left') do |env, args|
+    func = args.car
+    initval = args.cdr.car
+    list = args.cdr.cdr.car
+
+    list.inject(initval) do |a,b|
+      func.call(env, SExpr.construct_list([a, b]))
+    end
+  end
+
+  def_function(:'fold-right') do |env, args|
+    func = args.car
+    initval = args.cdr.car
+    list = args.cdr.cdr.car
+
+    list.to_a.reverse.inject(initval) do |a,b|
+      func.call(env, SExpr.construct_list([b, a]))
+    end
+  end
+
   def_alias(:progn, :begin)
   def_alias(:exit, :quit)
-  
-
 
   def_function(:'debug-format') do |env, args|
     String.new(args.car.inspect)
