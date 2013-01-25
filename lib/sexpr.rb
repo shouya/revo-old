@@ -35,6 +35,11 @@ module Revo
       @next = next_
     end
 
+    def ==(another)
+      return false unless another.is_a? SExpr
+      @val == another.val and @next == another.next
+    end
+
     def cons(next_)
       @next = next_
       self
@@ -59,6 +64,7 @@ module Revo
       @next
     end
 
+    include Enumerable
     def each(&block)
       yield @val
 
