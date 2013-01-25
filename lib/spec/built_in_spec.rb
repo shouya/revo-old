@@ -178,7 +178,6 @@ describe Revo do
 
     assert_equal('(let* ((x 1) (y x)) (+ x y))', '2')
     assert_equal('(let* ((x 1) (y x) (z y)) (+ y z))', '2')
-
   end
 
   it 'evaluates' do
@@ -195,6 +194,67 @@ describe Revo do
   (eval x ctx))
     ss
 =end
+  end
+
+  it 'supports letrec' do
+    assert_equal(<<-'ss', '(#f #t)')
+(letrec ((local-even? (lambda (n)
+                        (if (= n 0) #t
+                            (local-odd? (- n 1)))))
+         (local-odd? (lambda (n)
+                        (if (= n 0) #f
+                            (local-even? (- n 1))))))
+  (list (local-even? 23) (local-odd? 23)))
+    ss
+  end
+
+  it 'supports let as recusion syntatic sugar' do
+    assert_equal(<<-'ss', 'liftoff')
+(let countdown ((i 10))
+  (if (= i 0) 'liftoff
+      (countdown (- i 1))))
+    ss
+  end
+
+  it 'reverses lists' do
+    assert_equal("(reverse '(1 2 (3 4)))", '((3 4) 2 1)')
+  end
+
+  it 'supports type-of' do
+    assert_equal('(type-of 1)', 'number')
+    assert_equal("(type-of 'a)", 'symbol')
+    assert_equal('(type-of "str")', 'string')
+    assert_equal('(type-of #t)', 'bool')
+    assert_equal('(type-of #f)', 'bool')
+    assert_equal("(type-of '())", 'null')
+    assert_equal("(type-of let)", 'macro')
+    assert_equal("(type-of +)", 'function')
+    assert_equal("(type-of '(1 2))", 'list')
+    assert_equal('(type-of (lambda (a) 1))', 'lambda')
+
+    assert_equal("(type-of '1)", 'number')
+  end
+
+  it 'folds' do
+    assert_equal("(fold-left + 0 '(1 2 3))", '6')
+    assert_equal("(fold-right + 0 '(1 2 3))", '6')
+
+    assert_equal("(fold-left (lambda (x y) y) 5 '(1 2 3))", '3')
+    assert_equal("(fold-right (lambda (x y) x) 5 '(1 2 3))", '1')
+
+    assert_equal("(fold-left (lambda (x y) x) 5 '(1 2 3))", '5')
+    assert_equal("(fold-right (lambda (x y) y) 5 '(1 2 3))", '5')
+  end
+
+  it 'does type assertions' do
+    assert_equal("(null? '())", '#t')
+
+    # TODO: other type's assertions
+    #    assert_equal("(number? '())", '1')
+  end
+
+  it 'works with alias' do
+    assert_equal('(progn 1 2)', '2') # alias -> begin
   end
 
 
