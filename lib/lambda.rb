@@ -25,6 +25,18 @@ class Revo::Lambda < Revo::ValueClass
     body.eval(private_context)
   end
 
+  def to_s
+    "<lambda \#(0x#{self.object_id.to_i.to_s(16)})>"
+  end
+  alias_method :inspect, :to_s
+
+  def val
+    {
+      :params => @params,
+      :body => @body,
+      :is_macro => @is_macro
+    }
+  end
 
   private
   def construct_args_hash(args)

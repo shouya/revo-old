@@ -96,7 +96,8 @@
 ;	  '('a 2 "3" '(4) '() #t (lambda (x) (x))))
 
 ;(display (fold-right + 0 '(1 2 3)))
-(display (fold-left + 0 '(1 2 3)))
+;(display (fold-left + 0 '(1 2 3)))
+;(display (debug-format (lambda (x) (x))))
 
 ;(begin
 ;  (define x '(1 2))
