@@ -1,4 +1,5 @@
 
+
 require_relative '../revo'
 
 describe Revo do
@@ -45,6 +46,8 @@ describe Revo do
     assert_equal('((lambda (a) (+ a 1)) 1)',  '2')
     assert_equal('((lambda (a b) (+ a b)) 2 3)', '5')
     assert_equal("((lambda (a . b) (eval (cons '+ (cons a b)))) 1 2 3)", '6')
+
+    assert_equal('((lambda a a) 1 2 3)',  '(1 2 3)')
   end
 
   it 'supports global vars' do
