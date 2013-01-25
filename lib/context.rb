@@ -10,7 +10,7 @@ class Revo::Context
   class << self
     attr_accessor :global
     def global
-      @global ||= Context.new(nil)
+      @global ||= self.new(nil)
     end
   end
 

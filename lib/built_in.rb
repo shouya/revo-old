@@ -9,6 +9,7 @@ require_relative 'parser.tab'
 
 
 module Revo::BuiltInFunctions
+  include Revo
 
   class << self
     include Revo
@@ -89,7 +90,7 @@ module Revo::BuiltInFunctions
   def_function(:/) do |env, args|
     quot = args.car.val
     args.cdr.each do |x|
-      quot /= x
+      quot /= x.val
     end
     Number.new(quot)
   end
@@ -376,10 +377,55 @@ module Revo::BuiltInFunctions
     nil
   end
 
+  def_function(:'fold-left') do |env, args|
+    func = args.car
+    initval = args.cdr.car
+    list = args.cdr.cdr.car
+
+    list.inject(initval) do |a,b|
+      func.call(env, SExpr.construct_list([a, b]))
+    end
+  end
+
+  def_function(:'fold-right') do |env, args|
+    func = args.car
+    initval = args.cdr.car
+    list = args.cdr.cdr.car
+
+    list.to_a.reverse.inject(initval) do |a,b|
+      func.call(env, SExpr.construct_list([b, a]))
+    end
+  end
+
+  def_macro(:quasiquote) do |env, args|
+    unquote = lambda do |arg|
+      if arg.is_a? SExpr
+        v = arg.val
+        if v.is_a? Symbol and v.val == 'unquote'
+          return arg.cdr.car.eval(env)
+        elsif v.is_a? SExpr
+          if v.val.is_a? Symbol and v.val.val == 'unquote-splicing'
+            return v.cdr.car.eval(env).tap do |x|
+              x = x.next until x.next.null?
+              x.next = unquote.call(arg.cdr)
+            end
+          else
+            v = SExpr.new(unquote.call(v))
+          end
+        else
+          v = SExpr.new(v)
+        end
+        v.cons(unquote.call(arg.cdr))
+      else
+        arg
+      end # end of if arg.is_a? SExpr
+    end # end of lambda
+
+    unquote.call(args.car)
+  end
+
   def_alias(:progn, :begin)
   def_alias(:exit, :quit)
-  
-
 
   def_function(:'debug-format') do |env, args|
     String.new(args.car.inspect)
