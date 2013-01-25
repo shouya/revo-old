@@ -24,6 +24,10 @@ rule
          expr: literal  { val[0] }
              | list     { val[0] }
              | pair     { val[0] }
+             | quoted_expr      { val[0] }
+             | quasiquote       { val[0] }
+             | unquote          { val[0] }
+             | unquote_splicing { val[0] }
 
          pair: LBRACKET pair_content RBRACKET { val[1] }
 
@@ -35,7 +39,6 @@ rule
                }
 
          list: LBRACKET list_content RBRACKET  { val[1] }
-             | quoted_expr                     { val[0] }
 
 
  list_content: /* empty */       { NULL }
@@ -43,6 +46,17 @@ rule
 
   quoted_expr: QUOTE expr        {
                  SExpr.new(Symbol.new('quote')).cons(SExpr.new(val[1]))
+               }
+
+   quasiquote: BACKQUOTE expr    {
+                 SExpr.new(Symbol.new('quasiquote')).cons(SExpr.new(val[1]))
+               }
+      unquote: COMMA expr        {
+                 SExpr.new(Symbol.new('unquote')).cons(SExpr.new(val[1]))
+               }
+unquote_splicing: COMMA_AT expr  {
+                 SExpr.new(Symbol.new('unquote-splicing'))
+                      .cons(SExpr.new(val[1]))
                }
 
 

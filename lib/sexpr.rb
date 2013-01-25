@@ -36,6 +36,7 @@ module Revo
     end
 
     def ==(another)
+      return false unless another.is_a? SExpr
       @val == another.val and @next == another.next
     end
 

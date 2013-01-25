@@ -106,6 +106,7 @@
 ;  (display x)
 ;  (newline))
 
-
+(begin
+  (display `(1 ,@'(1 2) 3) ))
 
 
