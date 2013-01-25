@@ -23,6 +23,10 @@ module Revo
       false
     end
 
+    def ==(another)
+      @val == another.val
+    end
+
     def inspect
       @val.inspect
     end
