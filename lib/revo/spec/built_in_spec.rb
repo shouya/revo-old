@@ -1,6 +1,6 @@
 
 
-require_relative '../revo'
+require_relative '../../revo'
 
 describe Revo do
   before :each do

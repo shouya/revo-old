@@ -4,10 +4,12 @@ RubyVM::InstructionSequence.compile_option = {
   :trace_instruction => false
 }
 
-require_relative 'built_in'
-require_relative 'scanner'
-require_relative 'parser.tab'
-require_relative 'sexpr_eval'
+
+
+require_relative 'revo/built_in'
+require_relative 'revo/scanner'
+require_relative 'revo/parser.tab'
+require_relative 'revo/sexpr_eval'
 
 
 
