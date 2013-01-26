@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+
+require_relative '../lib/revo'
+
+def main
+  scanner = Revo::Scanner.new
+  if ARGV.length == 0
+    scanner.scan_stdin
+  else
+    scanner.scan_file(ARGV[0])
+  end
+
+  parser = Revo::Parser.new(scanner)
+  lisp = parser.do_parse
+
+  Revo::BuiltInFunctions.load_symbols(Revo::Context.global)
+
+  lisp.eval(Revo::Context.global)
+end
+
+
+main if __FILE__ == $0
+
+
+
+
+
