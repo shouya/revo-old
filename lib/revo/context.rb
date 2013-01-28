@@ -2,6 +2,8 @@
 # Runtime Context Introducing
 #
 
+
+class Revo::NameError < RuntimeError; end
 class Revo::Context
   include Enumerable
   attr_accessor :parent
@@ -27,15 +29,14 @@ class Revo::Context
     return @symbols[name] if @symbols.key? name
     return @parent.lookup(name) if @parent
 
-    # TODO: Create a custom exception class
-    raise "Symbol '#{name}' is not found."
+    raise Revo::NameError, "Symbol '#{name}' is not found."
   end
 
   def lookup_context(name)
     return self if @symbols.key? name
     return @parent.lookup_context(name) if @parent
 
-    raise "Symbol '#{name}' is not found."
+    raise Revo::NameError, "Symbol '#{name}' is not found."
   end
 
   def each(&block)

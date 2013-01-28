@@ -69,7 +69,7 @@ module Revo
       scan_string(File.read(filename))
       @filename = filename
     end
-    def scan_Stream(stream)
+    def scan_stream(stream)
       scan_string(stream.read)
       @filename = '<stream>'
     end
