@@ -8,7 +8,8 @@ describe Revo do
       Revo::Parser.parse(str)
     end
     def eval(str)
-      parser = Revo::Parser.new(Revo::Scanner.new.tap {|x| x.scan_string(str) })
+      parser = Revo::Parser.new(Revo::Scanner.new
+                                  .tap {|x| x.scan_string(str) })
       Revo::BuiltInFunctions.load_symbols(Revo::Context.global)
       parser.do_parse.eval(Revo::Context.global)
     end
@@ -285,6 +286,33 @@ describe Revo do
     assert_equal('`(,@(list 1 2))', '(1 2)')
     assert_equal('\'(,@(list 1 2))', '((unquote-splicing (list 1 2)))')
   end
+
+  it 'does logics correctly' do
+    assert_equal('(and #t #t)', '#t')
+    assert_equal('(and #t #f)', '#f')
+    assert_equal('(and #f #t)', '#f')
+    assert_equal('(and 1 1)', '1')
+    assert_equal('(and 0 0)', '0')
+    assert_equal('(and 0 1)', '1')
+    assert_equal('(and 0 "")', '""')
+    assert_equal('(and "" 1)', '1')
+    assert_equal('(and #f "")', '#f')
+    assert_equal('(and "" #f)', '#f')
+    assert_equal('(and "" cdr)', 'cdr')
+    assert_equal('(and \'() car)', '()')
+    assert_equal('(and car \'())', '()')
+    assert_equal('(and \'() #f)', '()')
+    assert_equal('(and 1 2 3 4 5)', '5')
+    assert_equal('(and 1 2 3 4 #f)', '#f')
+
+    assert_equal('(or 1 2)', '1')
+    assert_equal('(or #f 1)', '1')
+    assert_equal('(or #f #f)', '#f')
+    assert_equal('(or #f \'())', '()')
+    assert_equal('(or "1" #f)', '1')
+    assert_equal('(or #f #f)', '#f')
+  end
+
 end
 
 

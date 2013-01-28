@@ -309,18 +309,20 @@ module Revo::BuiltInFunctions
     end
   end
   def_macro(:or) do |env, args|
+    result = nil
     args.each do |x|
       result = x.eval(env)
       return result if result.is_true?
     end
-    Bool.new(false)
+    result
   end
   def_macro(:and) do |env, args|
+    result = nil
     args.each do |x|
       result = x.eval(env)
       return result if result.is_false?
     end
-    Bool.new(true)
+    result
   end
   def_function(:map) do |env, args|
     proc = args.car
