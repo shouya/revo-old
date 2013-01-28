@@ -7,7 +7,7 @@
 require 'readline'
 require_relative '../lib/revo'
 
-CONFIG_FILES = ['/etc/revo', "#{ENV['HOME']}/.revorc"]
+CONFIG_FILES = ['/etc/revi', "#{ENV['HOME']}/.revirc"]
 
 @global_context = Revo::Context.global
 Revo::BuiltInFunctions.load_symbols(@global_context)
@@ -21,13 +21,23 @@ end
 
 def get_prompt(env)
   begin
-    env.lookup('revi-ps1').val
+    case ps1 = env.lookup('revi-ps1')
+    when Revo::String
+      ps1.val
+    when Revo::Lambda
+      ps1.call(env).val
+    end
   rescue Revo::NameError
     'revi> '
   end
 end
 
-#trap :INT, :SIG_IGN
+def completion(text)
+  @global_context.symbols.keys.grep(/^#{Regexp.escape(text)}/)
+end
+
+Readline.completion_proc = method(:completion).to_proc
+Readline.completion_append_character = ' '
 
 def repl(env)
   begin
@@ -35,6 +45,10 @@ def repl(env)
       return nil if line.nil?
       (Readline::HISTORY.pop; next) if line =~ /^\s*$/
       Readline::HISTORY.pop if Readline::HISTORY.to_a[-2] == line
+
+      if %w(quit exit).include? line
+        puts 'Use (exit) or Ctrl-D (i.e. EOF) to exit'
+      end
 
       begin
         val = Revo::Parser.parse(line).eval(env)
