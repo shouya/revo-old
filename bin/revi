@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+#
+# Revi(verb) == Revo interactive
+#
+
+
+require 'readline'
+require_relative '../lib/revo'
+
+CONFIG_FILES = ['/etc/revo', "#{ENV['HOME']}/.revorc"]
+
+@global_context = Revo::Context.global
+Revo::BuiltInFunctions.load_symbols(@global_context)
+
+def load_config(env)
+  CONFIG_FILES.each do |conf_file|
+    next unless File.readable?(conf_file)
+    Revo::Parser.parse(File.read(conf_file)).eval(env)
+  end
+end
+
+def get_prompt(env)
+  begin
+    env.lookup('revi-ps1').val
+  rescue Revo::NameError
+    'revi> '
+  end
+end
+
+#trap :INT, :SIG_IGN
+
+def repl(env)
+  begin
+    while line = Readline.readline(get_prompt(env), true)
+      return nil if line.nil?
+      (Readline::HISTORY.pop; next) if line =~ /^\s*$/
+      Readline::HISTORY.pop if Readline::HISTORY.to_a[-2] == line
+
+      begin
+        val = Revo::Parser.parse(line).eval(env)
+        env.store('_', val)
+      rescue Revo::NameError
+        puts $!.message
+      rescue Revo::ParseError
+        puts $!.message
+        puts $!.context
+      rescue RuntimeError
+        puts 'There is an error in your code, please check and try again.'
+        puts "Message: #{$!.message}"
+      else
+        puts "=> #{val.to_s}"
+      end
+    end
+  rescue Interrupt
+    puts
+    retry
+  end
+end
+
+def main
+  load_config(@global_context)
+  repl(@global_context)
+end
+
+main if __FILE__ == $0
+
+

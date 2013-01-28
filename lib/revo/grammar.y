@@ -78,6 +78,14 @@ require_relative 'symbol'
 require_relative 'sexpr'
 require_relative 'scanner'
 
+class Revo::ParseError < Racc::ParseError
+  attr_accessor :context, :message
+  def initialize(msg, ctx)
+    @message = msg
+    @context = ctx
+  end
+end
+
 ---- inner
 attr :scanner
 def initialize(scanner)
@@ -88,12 +96,13 @@ def next_token
   @scanner.next_token
 end
 
+
 def on_error(t, sym, stack)
-  print "Syntax error at "
-  puts "#{@scanner.filename}:#{@scanner.line_no}:#{@scanner.column_no}:"
-  print_context(@scanner.line_no, @scanner.column_no, 3)
-  puts "Unexpected token '#{sym}'."
-  abort
+  context =  print_context(@scanner.line_no, @scanner.column_no, 3)
+  msg = "Syntax error at "
+  msg << "#{@scanner.filename}:#{@scanner.line_no}:#{@scanner.column_no}. "
+  msg << "Unexpected token '#{sym}'."
+  raise Revo::ParseError.new(msg, context)
 end
 
 def self.parse(str)
@@ -102,6 +111,7 @@ end
 
 private
 def print_context(line_no, column_no, context)
+  retval = ''
   source = @scanner.source
   source_lines = source.lines.count
 
@@ -113,13 +123,14 @@ def print_context(line_no, column_no, context)
   line_no = range_end if line_no > range_end
 
   range_beg.upto(line_no) do |l|
-    puts "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}"
+    retval << "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}\n"
   end
 
-  puts "#{'-' * 3}--#{'-' * column_no}^"
+  retval << "#{'-' * 3}--#{'-' * column_no}^\n"
 
   (line_no + 1).upto(range_end) do |l|
-    puts "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}"
+    retval << "#{l.to_s.rjust(3)}: #{source.lines.to_a[l-1].chomp}\n"
   end
+  retval
 end
 
