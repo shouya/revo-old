@@ -13,15 +13,16 @@ options no_result_var
 start main
 rule
 
-         main: multi_expr
+         main: multi_expr        { val[0] }
+             | expr              { val[0] }
+             | /* empty */       { NULL }
 
-   multi_expr: /* empty */       { NULL }
-             | multi_expr_x      {
+   multi_expr: multi_expr_x      {
                  SExpr.new(Revo::Symbol.new('begin'))
                       .cons(val[0])
                }
 
- multi_expr_x: expr              { SExpr.new(val[0]) }
+ multi_expr_x: expr expr         { SExpr.new(val[0]).cons(SExpr.new(val[1])) }
              | expr multi_expr_x { SExpr.new(val[0]).cons(val[1]) }
 
 
