@@ -23,9 +23,9 @@ def get_prompt(env)
   begin
     case ps1 = env.lookup('revi-ps1')
     when Revo::String
-      ps1.val
+      ps1.val.to_s
     when Revo::Lambda
-      ps1.call(env).val
+      ps1.call(env).val.to_s
     end
   rescue Revo::NameError
     'revi> '
@@ -51,14 +51,16 @@ def repl(env)
       end
 
       begin
-        val = Revo::Parser.parse(line).eval(env)
+        lisp = Revo::Parser.parse(line)
+        next if list.null?
+        val = lisp.eval(env)
         env.store('_', val)
       rescue Revo::NameError
         puts $!.message
       rescue Revo::ParseError
         puts $!.message
         puts $!.context
-      rescue RuntimeError
+      rescue RuntimeError, StandardError
         puts 'There is an error in your code, please check and try again.'
         puts "Message: #{$!.message}"
       else
