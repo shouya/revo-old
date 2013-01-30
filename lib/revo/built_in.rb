@@ -432,4 +432,15 @@ module Revo::BuiltInFunctions
   def_function(:'debug-format') do |env, args|
     String.new(args.car.inspect)
   end
+
+  def_macro(:cond) do |env, args|
+    args.each do |list|
+      if (list.car.is_a? Symbol and
+          list.car.val == 'else') or
+          list.car.eval(env).is_true?
+        return list.cdr.car.eval(env)
+      end
+    end
+    return NULL
+  end
 end
