@@ -443,4 +443,8 @@ module Revo::BuiltInFunctions
     end
     return NULL
   end
+
+  def_macro(:remainder) do |env, args|
+    return Revo::Number.new(args.car.val % car.cdr.car.val)
+  end
 end
