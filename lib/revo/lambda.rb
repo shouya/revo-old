@@ -17,12 +17,13 @@ class Revo::Lambda < Revo::ValueClass
   end
 
   def call(context = nil, args = NULL)
-    evaled_args = is_macro ? args : args.eval_chain(context)
     private_context = Context.new(context || Context.global)
 
     @binding.each do |k, v|
       private_context.store(k, v)
     end
+
+    evaled_args = is_macro ? args : args.eval_chain(context)
 
     construct_args_hash(evaled_args).each do |k, v|
       private_context.store(k.val, v)

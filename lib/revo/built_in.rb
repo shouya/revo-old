@@ -32,7 +32,7 @@ module Revo::BuiltInFunctions
     def def_custom_macro(name, params_source, body_source)
       params = Parser.parse(params_source)
       body = Parser.parse(body_source)
-      @table[name.to_s] = Lambda.new(params, body, true)
+      @table[name.to_s] = Lambda.new({}, params, body, true)
     end
     def def_alias(new_name, old_name)
       @table[new_name.to_s] = @table[old_name.to_s]
@@ -140,8 +140,15 @@ module Revo::BuiltInFunctions
   def_macro(:define) do |env, args|
     name = args.car.val
     val = args.cdr.car.eval(env)
-    #    Context.global.lookup(name)
     Context.global.store(name, val)
+    val
+  end
+  def_macro(:set!) do |env, args|
+    name = args.car.val
+    orig_context = env.lookup_context(name)
+    raise NameError, "symbol '#{name}' not found" if orig_context.nil?
+    val = args.cdr.car.eval(env)
+    orig_context.store(name, val)
     val
   end
   def_macro(:'set-car!') do |env, args|
@@ -251,7 +258,8 @@ module Revo::BuiltInFunctions
 
     unless named_let.nil?
       context.store(named_let,
-                    Lambda.new(SExpr.construct_list(params), body))
+                    Lambda.new(env.snapshot,
+                               SExpr.construct_list(params), body))
     end
 
     body.eval(context)

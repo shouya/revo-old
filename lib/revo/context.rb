@@ -36,7 +36,8 @@ class Revo::Context
     return self if @symbols.key? name
     return @parent.lookup_context(name) if @parent
 
-    raise Revo::NameError, "Symbol '#{name}' is not found."
+    return nil
+#    raise Revo::NameError, "Symbol '#{name}' is not found."
   end
 
   def each(&block)
@@ -54,6 +55,10 @@ class Revo::Context
   def snapshot
     return @parent.snapshot.merge(@symbols) if @parent
     @symbols
+  end
+
+  def clear
+    @symbols.clear
   end
 end
 

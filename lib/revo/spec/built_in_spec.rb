@@ -10,6 +10,7 @@ describe Revo do
     def eval(str)
       parser = Revo::Parser.new(Revo::Scanner.new
                                   .tap {|x| x.scan_string(str) })
+      Revo::Context.global.clear
       Revo::BuiltInFunctions.load_symbols(Revo::Context.global)
       parser.do_parse.eval(Revo::Context.global)
     end
@@ -166,17 +167,20 @@ describe Revo do
     assert_equal("(begin (for-each (lambda (x) (define a x)) '(1 2)) a)", "2")
   end
 
-  it 'supports let* and fluit-let' do
+  it 'supports let* and fluid-let' do
+    # FIXME: fluid-let doesn't work
     assert_equal(<<-'ss', '101')
 (begin
   (define counter 1)
   (define bump-counter
     (lambda ()
-      (define counter (+ counter 1))
+      (set! counter (+ counter 1))
+; (display counter)(newline)
       counter))
   (fluid-let ((counter 99))
     (bump-counter)
-    (define x (bump-counter))) x)
+    (define x (bump-counter)))
+  x)
     ss
 
     assert_equal(<<-'ss', '1')
@@ -352,6 +356,25 @@ end
     assert_equal(<<'end', '2')
 (cond
   (else (+ 1 1)))
+end
+
+  end
+
+  it 'supports closures' do
+    assert_equal(<<'end', '(15 15)')
+(define gen_adder (lambda (x) (lambda (y) (+ x y))))
+(define add3 (gen_adder 5))
+(define add4 (gen_adder 4))
+(list (add3 10) (add4 11))
+end
+
+    # Y combinator!
+    assert_equal(<<'end', '10')
+(((lambda (f) (f f))
+  (lambda (a)
+    (lambda (x)
+      (if (= x 0) 0
+	  (+ x ((a a) (- x 1))))))) 4)
 end
 
   end
