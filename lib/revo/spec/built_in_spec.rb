@@ -19,11 +19,22 @@ describe Revo do
     end
   end
 
+  it 'does basis correctly' do
+    assert_equal('', '')
+    assert_equal('1', '1')
+    assert_equal('2', '2')
+    assert_equal('""', '""')
+    assert_equal('"1"', '"1"')
+    assert_equal('()', '()')
+    assert_equal('#t', '#t')
+    assert_equal('#f', '#f')
+  end
+
   it 'does arithmetic' do
     assert_equal('(+ 1 2 3)', '6')
 
     # TODO: support negative integer parsing
-    #    assert_equal('(- 1)', '-1')
+    # assert_equal('(- 1)', '-1')
     assert_equal('(- 3 2 1)', '0')
     assert_equal('(* 3 3)', '9')
     assert_equal('(* 3)', '3')
@@ -298,7 +309,7 @@ describe Revo do
     assert_equal('(and "" 1)', '1')
     assert_equal('(and #f "")', '#f')
     assert_equal('(and "" #f)', '#f')
-    assert_equal('(and "" cdr)', 'cdr')
+    # assert_equal('(and "" cdr)', eval('cdr'))
     assert_equal('(and \'() car)', '()')
     assert_equal('(and car \'())', '()')
     assert_equal('(and \'() #f)', '()')
@@ -309,9 +320,42 @@ describe Revo do
     assert_equal('(or #f 1)', '1')
     assert_equal('(or #f #f)', '#f')
     assert_equal('(or #f \'())', '()')
-    assert_equal('(or "1" #f)', '1')
+    assert_equal('(or "1" #f)', '"1"')
     assert_equal('(or #f #f)', '#f')
   end
+
+  it 'supports cond' do
+    assert_equal(<<'end', '1')
+(cond
+  ((= 1 1) 1))
+end
+    assert_equal(<<'end', '()')
+(cond
+  ((= 1 2) 1))
+end
+    assert_equal(<<'end', '1')
+(cond
+  (else 1))
+end
+    assert_equal(<<'end', '1')
+(cond
+  ((= 1 2) 2)
+  (else 1))
+end
+    assert_equal(<<'end', '4')
+(cond
+  ((= 1 2) 1)
+  ((= 3 2) 2)
+  (#f 3)
+  (else 4))
+end
+    assert_equal(<<'end', '2')
+(cond
+  (else (+ 1 1)))
+end
+
+  end
+
 
 end
 

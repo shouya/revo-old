@@ -52,7 +52,7 @@ def repl(env)
 
       begin
         lisp = Revo::Parser.parse(line)
-        next if list.null?
+        next if lisp.null?
         val = lisp.eval(env)
         env.store('_', val)
       rescue Revo::NameError
