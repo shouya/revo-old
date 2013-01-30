@@ -6,9 +6,10 @@ require_relative 'value'
 
 class Revo::Lambda < Revo::ValueClass
   include Revo
-  attr_accessor :body, :params, :is_macro
+  attr_accessor :body, :params, :is_macro, :binding
 
-  def initialize(params, body, is_macro = false)
+  def initialize(binding, params, body, is_macro = false)
+    @binding = binding
     @params = params
 
     @body = body
@@ -18,6 +19,10 @@ class Revo::Lambda < Revo::ValueClass
   def call(context = nil, args = NULL)
     evaled_args = is_macro ? args : args.eval_chain(context)
     private_context = Context.new(context || Context.global)
+
+    @binding.each do |k, v|
+      private_context.store(k, v)
+    end
 
     construct_args_hash(evaled_args).each do |k, v|
       private_context.store(k.val, v)

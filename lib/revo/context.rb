@@ -46,6 +46,15 @@ class Revo::Context
       @symbols.each
     end
   end
+
+  def keys
+    @symbols.keys
+  end
+
+  def snapshot
+    return @parent.snapshot.merge(@symbols) if @parent
+    @symbols
+  end
 end
 
 

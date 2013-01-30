@@ -27,7 +27,7 @@ module Revo::BuiltInFunctions
     def def_custom_function(name, params_source, body_source)
       params = Parser.parse(params_source)
       body = Parser.parse(body_source)
-      @table[name.to_s] = Lambda.new(params, body)
+      @table[name.to_s] = Lambda.new({}, params, body)
     end
     def def_custom_macro(name, params_source, body_source)
       params = Parser.parse(params_source)
@@ -176,7 +176,7 @@ module Revo::BuiltInFunctions
     lamb_params = args.car
     lamb_body = SExpr.new(Revo::Symbol.new('begin')).cons(args.cdr)
 
-    Lambda.new(lamb_params, lamb_body)
+    Lambda.new(env.snapshot, lamb_params, lamb_body)
   end
   def_macro(:if) do |env, args|
     cond = args.car.eval(env)
