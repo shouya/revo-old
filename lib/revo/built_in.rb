@@ -452,7 +452,45 @@ module Revo::BuiltInFunctions
     return NULL
   end
 
-  def_macro(:remainder) do |env, args|
+  def_function(:remainder) do |env, args|
     return Revo::Number.new(args.car.val % car.cdr.car.val)
   end
+
+  def_function(:append) do |env, args|
+    SExpr.new(args.car).cons(args.cdr.car)
+  end
+
+  def_function(:'number->string') do |env, args|
+    Revo::String.new(args.car.val.to_s)
+  end
+  def_function(:'string->number') do |env, args|
+    base = args.cdr.car.null? ? 10 : args.cdr.car.val
+    Revo::Number.new(args.car.val.to_i(base))
+  end
+  def_function(:'symbol->string') do |env, args|
+    Revo::String.new(args.car.val)
+  end
+  def_function(:'string->symbol') do |env, args|
+    Revo::Symbol.new(args.car.val)
+  end
+
+  def_function(:string?) do |env, args|
+    Revo::Bool.new(args.car.is_a? Revo::String)
+  end
+  def_function(:'string-length') do |env, args|
+    Revo::Number.new(args.car.val.length)
+  end
+  def_function(:substring) do |env, args|
+    start = args.cdr.car.val
+    end_ = args.cdr.cdr.car.null? ? -1 : args.cdr.cdr.car.val
+    Revo::String.new(args.car.val[start..end_])
+  end
+  def_function(:'string-append') do |env, args|
+    result = ''
+    args.each do |x|
+      result << x.val
+    end
+    Revo::String.new(result)
+  end
+
 end
