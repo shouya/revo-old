@@ -19,11 +19,11 @@ rule
 
    multi_expr: multi_expr_x      {
                  SExpr.new(Revo::Symbol.new('begin'))
-                      .cons(val[0])
+                      .cons!(val[0])
                }
 
- multi_expr_x: expr expr         { SExpr.new(val[0]).cons(SExpr.new(val[1])) }
-             | expr multi_expr_x { SExpr.new(val[0]).cons(val[1]) }
+ multi_expr_x: expr expr         { SExpr.new(val[0]).cons!(SExpr.new(val[1])) }
+             | expr multi_expr_x { SExpr.new(val[0]).cons!(val[1]) }
 
 
 
@@ -44,31 +44,31 @@ rule
          pair: LBRACKET pair_content RBRACKET { val[1] }
 
  pair_content: expr PERIOD expr {
-                 SExpr.new(val[0]).cons(val[2])
+                 SExpr.new(val[0]).cons!(val[2])
                }
              | expr pair_content      {
-                 SExpr.new(val[0]).cons(val[1])
+                 SExpr.new(val[0]).cons!(val[1])
                }
 
          list: LBRACKET list_content RBRACKET  { val[1] }
 
 
  list_content: /* empty */       { NULL }
-             | expr list_content { SExpr.new(val[0]).cons(val[1]) }
+             | expr list_content { SExpr.new(val[0]).cons!(val[1]) }
 
   quoted_expr: QUOTE expr        {
-                 SExpr.new(Symbol.new('quote')).cons(SExpr.new(val[1]))
+                 SExpr.new(Symbol.new('quote')).cons!(SExpr.new(val[1]))
                }
 
    quasiquote: BACKQUOTE expr    {
-                 SExpr.new(Symbol.new('quasiquote')).cons(SExpr.new(val[1]))
+                 SExpr.new(Symbol.new('quasiquote')).cons!(SExpr.new(val[1]))
                }
       unquote: COMMA expr        {
-                 SExpr.new(Symbol.new('unquote')).cons(SExpr.new(val[1]))
+                 SExpr.new(Symbol.new('unquote')).cons!(SExpr.new(val[1]))
                }
 unquote_splicing: COMMA_AT expr  {
                  SExpr.new(Symbol.new('unquote-splicing'))
-                      .cons(SExpr.new(val[1]))
+                      .cons!(SExpr.new(val[1]))
                }
 
 
