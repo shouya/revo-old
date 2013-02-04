@@ -2,23 +2,23 @@
 # Primitive Types of Revo
 #
 
-require_relative 'value'
+require_relative 'data'
 
 module Revo
-  class String < ValueClass
+  class String < Data
     def to_s
       @val
     end
   end
 
-  class Number < ValueClass
+  class Number < Data
     def to_s
       @val.to_s
     end
   end
 
   # Not supported yet.
-  class Char < ValueClass
+  class Char < Data
     def initialize(chr)
       if chr.is_a? Integer
         @val = chr
@@ -30,7 +30,7 @@ module Revo
       # TODO: Give a suitable represence for char
     end
   end
-  class Bool < ValueClass
+  class Bool < Data
     def is_true?
       @val
     end

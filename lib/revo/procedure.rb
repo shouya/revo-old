@@ -1,10 +1,8 @@
 
-
 require_relative 'code'
 
+
 module Revo
-  class Macro < Code
+  class Procedure < Code
   end
 end
-
-

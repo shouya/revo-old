@@ -2,10 +2,10 @@
 require_relative 'value'
 
 module Revo
-  class NullClass < ValueClass
+  class Null < Value
     class << self
       def null
-        @instance ||= new(nil)
+        @instance ||= new
       end
 
       private :new
@@ -16,35 +16,48 @@ module Revo
     end
     alias_method :to_s, :inspect
 
-    def list?
-      true
+    def ==(another)
+      another.null?
     end
+
     def atom?
+      false
+    end
+    def list?
       false
     end
     def is_true?
       false
     end
-    def is_false?
-      true
-    end
+
     def null?
       true
     end
 
-    # blackholes
+    # Simulating List
+    include Enumerable
     def each(*)
+      NULL
+    end
+    def to_ruby_list(tail_truncate = true)
+      tail_truncate and [] or [NULL]
+    end
+    def list_length
+      0
+    end
+    def eval_chain(*)
       NULL
     end
     def eval(*)
       NULL
     end
-    def eval_chain(*)
+    def apply(*)
       NULL
     end
 
+
   end
 
-  NULL = NullClass.null
+  NULL = Null.null
 end
 

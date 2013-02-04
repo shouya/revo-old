@@ -1,17 +1,14 @@
 
 
 module Revo
-  class ValueClass
-    attr_accessor :val
-    def initialize(val)
-      @val = val
-    end
+  class Value
     def atom?
       true
     end
     def list?
       !atom?
     end
+    alias_method :pair?, :list?
     def is_true?
       true
     end
@@ -19,23 +16,34 @@ module Revo
       !is_true?
     end
 
+    def code?
+      false
+    end
+    def data?
+      !code?
+    end
+
     def null?
       false
     end
 
     def ==(another)
-      @val == another.val
+      raise RuntimeError, "Not implmented `==' for" <<
+        " #{inspect}::#{self.class.to_s}"
     end
 
     def inspect
-      @val.inspect
+      "unimplemented 'inspect' for <#{self.class.to_s}::#{self.object_id}>"
     end
     def to_s
-      @val.to_s
+      "unimplemented 'to_s' for <#{self.class.to_s}::#{self.object_id}>"
     end
 
-    def eval(_)
-      self
+    def type_string
+      self.class.to_s
+        .sub(/.*::/, '')
+        .each_char.inject('') {|s,x| s << (x=~/[a-z]/ ? x : "-#{x.downcase}")}
+        .sub(/^-/, '')
     end
   end
 end

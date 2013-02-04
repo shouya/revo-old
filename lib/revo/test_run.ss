@@ -106,8 +106,5 @@
 ;  (display x)
 ;  (newline))
 
-(display `(1 ,@'(1 2) 3))
 (newline)
-(display (+ 1 1))
-(newline)
-
+(display (fold-left cons '() '(1 2 3)))

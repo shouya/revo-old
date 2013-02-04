@@ -13,16 +13,17 @@ require_relative 'prim_types'
 require_relative 'null'
 
 module Revo
-  class SExpr < ValueClass
+
+  class InvalidPairError < RuntimeError; end
+  class SExpr < Data
     class << self
-      def construct_list(array)
-        construct_pair(array << NULL)
-      end
-      def construct_pair(array)
-        return NULL if array.empty?
-        list = array[-1]
-        array[0..-2].reverse_each do |x|
-          list = SExpr.new(x).cons(list)
+      def construct_list(array, add_null_tail = true)
+        val_ary = array
+        val_ary << NULL if add_null_tail
+
+        list = val_ary[-1]
+        val_ary[0..-2].reverse_each do |x|
+          list = SExpr.new(x).cons!(list)
         end
         list
       end
@@ -40,7 +41,7 @@ module Revo
       @val == another.val and @next == another.next
     end
 
-    def cons(next_)
+    def cons!(next_)
       @next = next_
       self
     end
@@ -65,42 +66,70 @@ module Revo
     end
 
     include Enumerable
-    def each(&block)
-      yield @val
+    def each(truncate_tail = true, &block)
+      return to_ruby_list(truncate_tail).each unless block_given?
+      to_ruby_list(truncate_tail).each(&block)
+    end
 
-      return if list_tail?
-#      raise 'cannot `each` a pair' if pair_tail?
+    def list_tail?
+      # (1 2 3) === (1 2 3 . ())
+      #      ^           ^
+      @next.null?
+    end
+    def pair_tail?
+      # (1 2 3 . 4)
+      #      ^
+      @next.atom?
+    end
 
-      @next.each(&block)
+
+    def to_ruby_list(tail_truncate = true)
+      iter = self
+      result_list = []
+
+      until iter.null? or iter.atom?
+        result_list << iter.val
+        iter = iter.next
+      end
+
+      if tail_truncate
+        raise InvalidPairError if iter.atom?
+      else
+        result_list << iter
+      end
+
+      result_list
+    end
+
+    def list_length
+      to_ruby_list(true).count
+    end
+
+    def append!(tail)
+      tail_node.next = SExpr.new(tail).cons!(NULL)
+      self
+    end
+
+    def type_string
+      'list'
     end
 
     protected
     def to_list_string
       if pair_tail?
         "#{@val.inspect} . #{@next.inspect}"
-
       elsif list_tail?
         "#{@val.inspect}"
-
-      # (1 2 3)
-      #    ^
       else
         "#{@val.inspect} #{@next.to_list_string}"
       end
     end
 
-    def list_tail?
-      # (1 2 3)
-      #      ^
-      @next.null?
-    end
-    def pair_tail?
-      # (1 2 3 . 4)
-      #      ^                  ^
-      @next.atom?   # or @next.next.nil?
-
-      # Not (1 2 3 . (1 2)), since it equals to:
-      #     (1 2 3 1 . 2)
+    def tail_node
+      iter = self
+      iter = iter.next while iter.next.list?
+      raise InvalidPairError if iter.next.atom?
+      iter
     end
 
   end

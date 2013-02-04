@@ -1,10 +1,10 @@
 
 
 require_relative 'context'
-require_relative 'value'
+require_relative 'data'
 
 module Revo
-  class Symbol < ValueClass
+  class Symbol < Data
     def inspect
       "#@val"
     end

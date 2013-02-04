@@ -25,6 +25,10 @@ class Revo::Context
     @symbols[name] = data
   end
 
+  def store_mass(hash)
+    @symbols.merge!(hash)
+  end
+
   def lookup(name)
     return @symbols[name] if @symbols.key? name
     return @parent.lookup(name) if @parent
@@ -36,7 +40,8 @@ class Revo::Context
     return self if @symbols.key? name
     return @parent.lookup_context(name) if @parent
 
-    raise Revo::NameError, "Symbol '#{name}' is not found."
+    return nil
+#    raise Revo::NameError, "Symbol '#{name}' is not found."
   end
 
   def each(&block)
@@ -45,6 +50,24 @@ class Revo::Context
     else
       @symbols.each
     end
+  end
+
+  def keys
+    @symbols.keys
+  end
+
+  def snapshot
+    iter = self
+    hash = {}
+    begin
+      hash = iter.symbols.merge(hash)
+      iter = iter.parent
+    end until iter.parent.nil?
+    hash
+  end
+
+  def clear
+    @symbols.clear
   end
 end
 
