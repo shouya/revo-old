@@ -106,5 +106,10 @@
 ;  (display x)
 ;  (newline))
 
+(define (add a b)
+  (+ a b))
+
+(display (add 1 2))
+
 (newline)
-(display (fold-left cons '() '(1 2 3)))
+

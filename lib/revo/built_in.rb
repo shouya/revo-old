@@ -121,12 +121,25 @@ module Revo::BuiltInFunctions
 
   def_macro(:quote, '(x)') { param[:x] }
 
-  def_macro(:define, '(k v)') do |env|
-    assert(param[:k].is_a? Revo::Symbol)
-    v = param[:v].eval(env)
-    v.name = param[:k].val if v.is_a? Code
-    Context.global.store(param[:k].val, v)
-    v
+  def_macro(:define, '(k . v)') do |env|
+    assert((param[:k].is_a?(Symbol) && (param[:v].list_length == 1)) |p|
+           param[:k].list?)
+
+    if param[:k].is_a? Revo::Symbol
+      v = param[:v].car.eval(env)
+      v.name = param[:k].val if v.is_a? Code
+      Context.global.store(param[:k].val, v)
+      return v
+    else
+      # syntatic sugar for lambda definition
+      lamb_name = param[:k].car
+      lamb_params = param[:k].cdr
+      lamb_body = param[:v]
+      lamb = call_proc(:lambda, env,
+                       cons(lamb_params, lamb_body))
+      return call_proc(:define, env,
+                       list(lamb_name, quote(lamb)))
+    end
   end
 
   def_macro(:set!, '(k v)') do |env|
@@ -181,7 +194,7 @@ module Revo::BuiltInFunctions
     lamb_body = case lamb_body.list_length
                 when 0 then NULL
                 when 1 then lamb_body.car
-                else        SExpr.new(Symbol.new('begin')).cons!(lamb_body)
+                else        begin_cons(lamb_body)
                 end
 
     UserLambda.new(env.snapshot, lamb_params, lamb_body)
@@ -450,13 +463,16 @@ module Revo::BuiltInFunctions
   end
 
   def_procedure(:'list->vector', '(list)') do
+    assert(param[:list].list?)
     param[:list].to_vector
   end
   def_procedure(:'vector->list', '(vector)') do
+    assert(param[:vector].is_a? Vector)
     param[:vector].to_list
   end
   def_procedure(:'vector-ref', '(vector n)') do
-    param[:vector].ref(n)
+    assert((param[:n].is_a? Number) && (param[:vector].is_a? Vector))
+    param[:vector].ref(param[:n].val)
   end
 
 =begin
