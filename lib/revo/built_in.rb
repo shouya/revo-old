@@ -449,6 +449,16 @@ module Revo::BuiltInFunctions
     return NULL
   end
 
+  def_procedure(:'list->vector', '(list)') do
+    param[:list].to_vector
+  end
+  def_procedure(:'vector->list', '(vector)') do
+    param[:vector].to_list
+  end
+  def_procedure(:'vector-ref', '(vector n)') do
+    param[:vector].ref(n)
+  end
+
 =begin
   def_procedure(:'debug-format') do |env, args|
     String.new(args.car.inspect)

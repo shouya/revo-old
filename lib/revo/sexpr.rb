@@ -11,6 +11,7 @@
 
 require_relative 'prim_types'
 require_relative 'null'
+require_relative 'vector'
 
 module Revo
 
@@ -112,6 +113,10 @@ module Revo
 
     def type_string
       'list'
+    end
+
+    def to_vector
+      Vector.new(to_ruby_list)
     end
 
     protected
