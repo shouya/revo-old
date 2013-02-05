@@ -252,7 +252,7 @@ module Revo::BuiltInFunctions
 
       params = SExpr.construct_list(vars.map(&:car))
 
-      lamb = call_proc(:lambda, env, SExpr.new(params).cons!(body))
+      lamb = call_proc(:lambda, local_scope, SExpr.new(params).cons!(body))
       lamb.name = name
 
       local_scope.store(name, lamb)

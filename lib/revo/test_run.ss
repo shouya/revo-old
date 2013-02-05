@@ -106,12 +106,5 @@
 ;  (display x)
 ;  (newline))
 
-(let ((msg "none"))
-  (define (set-msg new-msg)
-    (set! msg new-msg))
-  (define (get-msg)
-    msg))
 
-(set-msg "adsf")
-(display (get-msg))
 
