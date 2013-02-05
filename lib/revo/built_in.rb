@@ -144,6 +144,7 @@ module Revo::BuiltInFunctions
 
   def_macro(:set!, '(k v)') do |env|
     assert(param[:k].is_a? Revo::Symbol)
+    p env.parent.parent.symbols
     orig_context = env.lookup_context(param[:k].val)
     raise NameError, "symbol '#{name}' not found" if orig_context.nil?
     val = param[:v].eval(env)
@@ -264,8 +265,7 @@ module Revo::BuiltInFunctions
       local_scope.store(x.car.val, x.cdr.car.eval(env))
     end
 
-
-    body = SExpr.new(Symbol.new('begin')).cons!(body)
+    body = begin_cons(body)
 
     body.eval(local_scope)
   end
@@ -274,7 +274,7 @@ module Revo::BuiltInFunctions
     vars = param[:vars]
     body = SExpr.new(Revo::Symbol.new('begin')).cons!(param[:body])
 
-    context = Context.global
+    context = env
     vars.each do |x|
       context = Context.new(context)
       context.store(x.car.val, x.cdr.car.eval(context))
@@ -475,13 +475,23 @@ module Revo::BuiltInFunctions
     param[:vector].ref(param[:n].val)
   end
 
+  def_procedure(:remainder, '(a b)') do |env|
+    return Revo::Number.new(param[:a].val % param[:b].val)
+  end
+
+  def_procedure(:'context-probe', '(a . rst)') do |env|
+    hash = env.snapshot
+    if param[:rst].is_true?
+      global_vars = Context.global.snapshot.keys
+      hash.delete_if {|k,_| global_vars.include? k }
+    end
+    p hash
+    param[:a]
+  end
+
 =begin
   def_procedure(:'debug-format') do |env, args|
     String.new(args.car.inspect)
-  end
-
-  def_procedure(:remainder) do |env, args|
-    return Revo::Number.new(args.car.val % car.cdr.car.val)
   end
 
   def_procedure(:append) do |env, args|
