@@ -33,7 +33,8 @@ module Revo::BuiltInFunctions
     def def_lambda(name, params_source, body_source)
       params = Parser.parse(params_source)
       body = Parser.parse(body_source)
-      @table[name.to_s] = UserLambda.new({}, params, body, name.to_s)
+      @table[name.to_s] = UserLambda.new(Context.global,
+                                         params, body, name.to_s)
     end
 
     def def_user_macro(name, params_source, body_source)
@@ -144,7 +145,6 @@ module Revo::BuiltInFunctions
 
   def_macro(:set!, '(k v)') do |env|
     assert(param[:k].is_a? Revo::Symbol)
-    p env.parent.parent.symbols
     orig_context = env.lookup_context(param[:k].val)
     raise NameError, "symbol '#{name}' not found" if orig_context.nil?
     val = param[:v].eval(env)
@@ -198,7 +198,7 @@ module Revo::BuiltInFunctions
                 else        begin_cons(lamb_body)
                 end
 
-    UserLambda.new(env.snapshot, lamb_params, lamb_body)
+    UserLambda.new(env, lamb_params, lamb_body)
   end
 
   def_macro(:if, '(cond t f)') do |env|
