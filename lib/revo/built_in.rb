@@ -342,25 +342,13 @@ module Revo::BuiltInFunctions
   def_procedure(:map, '(proc . lists)') do |env|
     proc = param[:proc]
     lists = param[:lists]
-    rubified_lists = []
 
-    lists.each do |x|
-      tmp = []
-      x.each {|xx| tmp << xx }
-      rubified_lists << tmp
+    new_list = []
+    lists.to_ruby_list.map(&:to_ruby_list).transpose.each do |x|
+      new_list << proc.call(env, list(*x.map{|x| quote(x)}))
     end
 
-    pairs = rubified_lists.first
-      .zip(*rubified_lists[1..-1]).map {|x| SExpr.construct_list(x) }
-
-    new_list = SExpr.new(Revo::Symbol.new('head'))
-    new_list_head = new_list
-
-    pairs.each do |x|
-      new_list.cons!(SExpr.new(proc.call(env, x)))
-      new_list = new_list.cdr
-    end
-    new_list_head.cdr
+    list(*new_list)
   end
 
   def_macro(:'for-each', 'args') do |env|

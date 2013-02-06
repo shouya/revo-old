@@ -107,4 +107,5 @@
 ;  (newline))
 
 
+(display (map car '((123 321) (234 432))))
 
