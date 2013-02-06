@@ -107,7 +107,7 @@ module Revo
     end
 
     def append!(tail)
-      tail_node.next = SExpr.new(tail).cons!(NULL)
+      tail_node.next = tail
       self
     end
 
@@ -132,7 +132,7 @@ module Revo
 
     def tail_node
       iter = self
-      iter = iter.next while iter.next.list?
+      iter = iter.next until iter.next.null?
       raise InvalidPairError if iter.next.atom?
       iter
     end

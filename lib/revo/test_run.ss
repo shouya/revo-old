@@ -106,6 +106,9 @@
 ;  (display x)
 ;  (newline))
 
+(define (ladder-shift lol)
+  (if (null? lol) '()
+      (cons (car lol)
+	    (map (lambda (x) (append x '(0))) (ladder-shift (cdr lol))))))
 
-(display (map car '((123 321) (234 432))))
-
+(display (ladder-shift '((1 2) (3 4))))

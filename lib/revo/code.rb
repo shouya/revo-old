@@ -154,6 +154,9 @@ module Revo
     def begin_cons(exprs)
       SExpr.new(Symbol.new('begin')).cons!(exprs)
     end
+    def append(*lists)
+      list(*lists[0..-2].inject([], &:concat)).append!(lists[-1])
+    end
   end
 
   Code.extend(CodeUtilities)

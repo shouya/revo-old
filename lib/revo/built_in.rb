@@ -469,7 +469,7 @@ module Revo::BuiltInFunctions
 
   def_procedure(:'context-probe', '(a . rst)') do |env|
     hash = env.snapshot
-    if param[:rst].is_true?
+    if param[:rst].list_length >= 1
       global_vars = Context.global.snapshot.keys
       hash.delete_if {|k,_| global_vars.include? k }
     end
@@ -477,14 +477,36 @@ module Revo::BuiltInFunctions
     param[:a]
   end
 
+  def_procedure(:append, 'lists') do
+    lists = param[:lists].to_ruby_list
+    assert(lists[0..-2].all?(&:list?))
+    last = lists.pop
+
+    SExpr.construct_list(lists.map(&:to_ruby_list)
+                           .inject([], &:concat)).append!(last)
+  end
+  def_procedure(:length, '(lst)') do
+    assert(param[:lst].list?)
+    Number.new(param[:lst].list_length)
+  end
+
+  def_procedure(:apply, '(proc . objs)') do |env|
+    assert(param[:proc].is_a? Code)
+    objs = param[:objs].to_ruby_list
+    assert(objs.last.list?)
+    last = objs.pop
+
+    args = SExpr.construct_list(objs.map {|x| quote(x) })
+      .append!(list(*last.map {|x| quote(x) }))
+
+    param[:proc].apply(env, args)
+  end
+
 =begin
   def_procedure(:'debug-format') do |env, args|
     String.new(args.car.inspect)
   end
 
-  def_procedure(:append) do |env, args|
-    SExpr.new(args.car).cons!(args.cdr.car)
-  end
 
   def_procedure(:'number->string') do |env, args|
     Revo::String.new(args.car.val.to_s)
