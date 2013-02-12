@@ -11,6 +11,7 @@
 
 require_relative 'prim_types'
 require_relative 'null'
+require_relative 'vector'
 
 module Revo
 
@@ -106,12 +107,16 @@ module Revo
     end
 
     def append!(tail)
-      tail_node.next = SExpr.new(tail).cons!(NULL)
+      tail_node.next = tail
       self
     end
 
     def type_string
       'list'
+    end
+
+    def to_vector
+      Vector.new(to_ruby_list)
     end
 
     protected
@@ -127,7 +132,7 @@ module Revo
 
     def tail_node
       iter = self
-      iter = iter.next while iter.next.list?
+      iter = iter.next until iter.next.null?
       raise InvalidPairError if iter.next.atom?
       iter
     end

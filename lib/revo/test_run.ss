@@ -106,5 +106,9 @@
 ;  (display x)
 ;  (newline))
 
-(newline)
-(display (fold-left cons '() '(1 2 3)))
+(define (ladder-shift lol)
+  (if (null? lol) '()
+      (cons (car lol)
+	    (map (lambda (x) (append x '(0))) (ladder-shift (cdr lol))))))
+
+(display (ladder-shift '((1 2) (3 4))))

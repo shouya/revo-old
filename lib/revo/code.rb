@@ -141,11 +141,21 @@ module Revo
       env.lookup(proc_name.to_s).call(env, args)
     end
 
+    def cons(car, cdr)
+      SExpr.new(car).cons!(cdr)
+    end
+    def list(*eles)
+      SExpr.construct_list(eles)
+    end
+
     def quote(val)
       SExpr.construct_list([Symbol.new('quote'), val])
     end
-    def begin(exprs)
+    def begin_cons(exprs)
       SExpr.new(Symbol.new('begin')).cons!(exprs)
+    end
+    def append(*lists)
+      list(*lists[0..-2].inject([], &:concat)).append!(lists[-1])
     end
   end
 

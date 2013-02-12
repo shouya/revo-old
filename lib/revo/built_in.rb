@@ -33,7 +33,8 @@ module Revo::BuiltInFunctions
     def def_lambda(name, params_source, body_source)
       params = Parser.parse(params_source)
       body = Parser.parse(body_source)
-      @table[name.to_s] = UserLambda.new({}, params, body, name.to_s)
+      @table[name.to_s] = UserLambda.new(Context.global,
+                                         params, body, name.to_s)
     end
 
     def def_user_macro(name, params_source, body_source)
@@ -121,12 +122,25 @@ module Revo::BuiltInFunctions
 
   def_macro(:quote, '(x)') { param[:x] }
 
-  def_macro(:define, '(k v)') do |env|
-    assert(param[:k].is_a? Revo::Symbol)
-    v = param[:v].eval(env)
-    v.name = param[:k].val if v.is_a? Code
-    Context.global.store(param[:k].val, v)
-    v
+  def_macro(:define, '(k . v)') do |env|
+    assert((param[:k].is_a?(Symbol) && (param[:v].list_length == 1)) |p|
+           param[:k].list?)
+
+    if param[:k].is_a? Revo::Symbol
+      v = param[:v].car.eval(env)
+      v.name = param[:k].val if v.is_a? Code
+      Context.global.store(param[:k].val, v)
+      return v
+    else
+      # syntatic sugar for lambda definition
+      lamb_name = param[:k].car
+      lamb_params = param[:k].cdr
+      lamb_body = param[:v]
+      lamb = call_proc(:lambda, env,
+                       cons(lamb_params, lamb_body))
+      return call_proc(:define, env,
+                       list(lamb_name, quote(lamb)))
+    end
   end
 
   def_macro(:set!, '(k v)') do |env|
@@ -181,10 +195,10 @@ module Revo::BuiltInFunctions
     lamb_body = case lamb_body.list_length
                 when 0 then NULL
                 when 1 then lamb_body.car
-                else        SExpr.new(Symbol.new('begin')).cons!(lamb_body)
+                else        begin_cons(lamb_body)
                 end
 
-    UserLambda.new(env.snapshot, lamb_params, lamb_body)
+    UserLambda.new(env, lamb_params, lamb_body)
   end
 
   def_macro(:if, '(cond t f)') do |env|
@@ -238,7 +252,7 @@ module Revo::BuiltInFunctions
 
       params = SExpr.construct_list(vars.map(&:car))
 
-      lamb = call_proc(:lambda, env, SExpr.new(params).cons!(body))
+      lamb = call_proc(:lambda, local_scope, SExpr.new(params).cons!(body))
       lamb.name = name
 
       local_scope.store(name, lamb)
@@ -251,8 +265,7 @@ module Revo::BuiltInFunctions
       local_scope.store(x.car.val, x.cdr.car.eval(env))
     end
 
-
-    body = SExpr.new(Symbol.new('begin')).cons!(body)
+    body = begin_cons(body)
 
     body.eval(local_scope)
   end
@@ -261,7 +274,7 @@ module Revo::BuiltInFunctions
     vars = param[:vars]
     body = SExpr.new(Revo::Symbol.new('begin')).cons!(param[:body])
 
-    context = Context.global
+    context = env
     vars.each do |x|
       context = Context.new(context)
       context.store(x.car.val, x.cdr.car.eval(context))
@@ -329,25 +342,13 @@ module Revo::BuiltInFunctions
   def_procedure(:map, '(proc . lists)') do |env|
     proc = param[:proc]
     lists = param[:lists]
-    rubified_lists = []
 
-    lists.each do |x|
-      tmp = []
-      x.each {|xx| tmp << xx }
-      rubified_lists << tmp
+    new_list = []
+    lists.to_ruby_list.map(&:to_ruby_list).transpose.each do |x|
+      new_list << proc.call(env, list(*x.map{|x| quote(x)}))
     end
 
-    pairs = rubified_lists.first
-      .zip(*rubified_lists[1..-1]).map {|x| SExpr.construct_list(x) }
-
-    new_list = SExpr.new(Revo::Symbol.new('head'))
-    new_list_head = new_list
-
-    pairs.each do |x|
-      new_list.cons!(SExpr.new(proc.call(env, x)))
-      new_list = new_list.cdr
-    end
-    new_list_head.cdr
+    list(*new_list)
   end
 
   def_macro(:'for-each', 'args') do |env|
@@ -449,18 +450,63 @@ module Revo::BuiltInFunctions
     return NULL
   end
 
+  def_procedure(:'list->vector', '(list)') do
+    assert(param[:list].list?)
+    param[:list].to_vector
+  end
+  def_procedure(:'vector->list', '(vector)') do
+    assert(param[:vector].is_a? Vector)
+    param[:vector].to_list
+  end
+  def_procedure(:'vector-ref', '(vector n)') do
+    assert((param[:n].is_a? Number) && (param[:vector].is_a? Vector))
+    param[:vector].ref(param[:n].val)
+  end
+
+  def_procedure(:remainder, '(a b)') do |env|
+    return Revo::Number.new(param[:a].val % param[:b].val)
+  end
+
+  def_procedure(:'context-probe', '(a . rst)') do |env|
+    hash = env.snapshot
+    if param[:rst].list_length >= 1
+      global_vars = Context.global.snapshot.keys
+      hash.delete_if {|k,_| global_vars.include? k }
+    end
+    p hash
+    param[:a]
+  end
+
+  def_procedure(:append, 'lists') do
+    lists = param[:lists].to_ruby_list
+    assert(lists[0..-2].all?(&:list?))
+    last = lists.pop
+
+    SExpr.construct_list(lists.map(&:to_ruby_list)
+                           .inject([], &:concat)).append!(last)
+  end
+  def_procedure(:length, '(lst)') do
+    assert(param[:lst].list?)
+    Number.new(param[:lst].list_length)
+  end
+
+  def_procedure(:apply, '(proc . objs)') do |env|
+    assert(param[:proc].is_a? Code)
+    objs = param[:objs].to_ruby_list
+    assert(objs.last.list?)
+    last = objs.pop
+
+    args = SExpr.construct_list(objs.map {|x| quote(x) })
+      .append!(list(*last.map {|x| quote(x) }))
+
+    param[:proc].apply(env, args)
+  end
+
 =begin
   def_procedure(:'debug-format') do |env, args|
     String.new(args.car.inspect)
   end
 
-  def_procedure(:remainder) do |env, args|
-    return Revo::Number.new(args.car.val % car.cdr.car.val)
-  end
-
-  def_procedure(:append) do |env, args|
-    SExpr.new(args.car).cons!(args.cdr.car)
-  end
 
   def_procedure(:'number->string') do |env, args|
     Revo::String.new(args.car.val.to_s)

@@ -18,6 +18,6 @@ module Revo
   end
 
   def to_lambda
-    UserLambda.new({}, @params, @body, @name)
+    UserLambda.new(Context.global, @body, @name)
   end
 end

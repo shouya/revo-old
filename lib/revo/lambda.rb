@@ -16,11 +16,10 @@ module Revo
     def call(env, args)
       check_arity(args)
 
-      ctx = Context.new(env)
+      ctx = Context.new(@binding)
       args = args.eval_chain(env)
       hash = self.class.transpose_param_arg(@params, args)
 
-      ctx.store_mass(@binding)
       ctx.store_mass(hash)
 
       @body.eval(ctx)

@@ -24,7 +24,7 @@ module Revo
       false
     end
     def list?
-      false
+      true
     end
     def is_true?
       false
@@ -54,7 +54,9 @@ module Revo
     def apply(*)
       NULL
     end
-
+    def cons!(x)
+      x
+    end
 
   end
 
